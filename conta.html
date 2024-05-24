@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="shortcut icon" type="imagex/png" href="images/logo.png">
+    <link rel="stylesheet" href="assets/css/stylelc.css ">
+    <title>Conta - SquadForge</title>
+</head>
+
+<body>
+
+    <div class="container" id="container">
+        <div class="form-container sign-up">
+            <form method="post" action="assets/php/verificaConta.php">
+                <h1>Criar uma Conta</h1>
+                <input type="hidden" name="action" value="register">
+                <input type="text" name="pnome" placeholder="Primeiro Nome" required>
+                <input type="text" name="unome" placeholder="Último Nome" required>
+                <input type="text" name="nutilizador" placeholder="Nome de Utilizador" required>
+                <input type="text" name="nfuncao" placeholder="Nome da Função" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="password" name="palavrapasse" id="palavrapasse" placeholder="Palavra-Passe" required>
+                <button type="button" onclick="togglePasswordVisibility('palavrapasse', 'toggleIcon1')" class="password-toggle">
+                    <i id="toggleIcon1" class="fas fa-eye"></i>
+                </button>
+                <button>Criar</button>
+            </form>
+        </div>
+        <div class="form-container sign-in">
+            <form method="post" action="assets/php/verificaConta.php">
+                <h1>Entrar</h1>
+                <input type="hidden" name="action" value="login">
+                <input type="text" name="emailnomeutilizador" placeholder="Email ou Nome de utilizador" required>
+                <input type="password" name="palavrapasse" id="palavrapassee" placeholder="Palavra-Passe" required>
+                <button type="button" onclick="togglePasswordVisibility('palavrapassee', 'toggleIcon2')" class="password-toggle">
+                    <i id="toggleIcon2" class="fas fa-eye"></i>
+                </button>
+                <a href="pedidoredefinirpp.html">Esqueceu-se da sua palavra-passe?</a>
+                <button>Entrar</button>
+            </form>
+        </div>
+        <div class="toggle-container">
+            <div class="toggle">
+                <div class="toggle-panel toggle-left">
+                    <h1>Bem vindo/a de volta!</h1>
+                    <p>Introduza os seus dados pessoais para utilizar todos os recursos da SquadForge</p>
+                    <button class="hidden" id="login">Entrar</button>
+                    <button class="hidden"><a href="index.html">Voltar ao inicio</a></button>
+                </div>
+                <div class="toggle-panel toggle-right">
+                    <h1>Olá, Amigo/a!</h1>
+                    <p>Registe os seus dados pessoais para ter acesso a todos os recursos da SquadForge</p>
+                    <button class="hidden" id="register">Criar conta</button>
+                    <button class="hidden"><a href="index.html">Voltar ao inicio</a></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="notification" class="notification"></div>
+
+    <script>
+
+        function getQueryParam(param) {
+        let urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+        }
+
+        // Função para mostrar notificação
+        function showNotification(message, type) {
+            const notificationElement = document.createElement('div');
+            notificationElement.classList.add('notification', type);
+
+            // Adiciona ícones para diferentes tipos de notificação
+            const icon = document.createElement('i');
+            if (type === 'success') {
+                icon.classList.add('fa', 'fa-check-circle');
+                notificationElement.style.backgroundColor = '#4CAF50';
+            } else if (type === 'error') {
+                icon.classList.add('fa', 'fa-times-circle');
+                notificationElement.style.backgroundColor = '#f44336';
+            }
+
+            // Adiciona texto da notificação
+            const text = document.createTextNode(message);
+            
+            // Adiciona ícone e texto ao elemento de notificação
+            notificationElement.appendChild(icon);
+            notificationElement.appendChild(text);
+
+            document.body.appendChild(notificationElement);
+
+            // Mostra a notificação com animação
+            setTimeout(() => {
+                notificationElement.classList.add('show');
+            }, 10);
+
+            // Remove a notificação após 5 segundos
+            setTimeout(() => {
+                notificationElement.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(notificationElement);
+                }, 500);
+            }, 5000);
+        }
+
+        // Função para remover os parâmetros da URL
+        function removeQueryParams() {
+            const url = new URL(window.location);
+            url.searchParams.delete('notification');
+            url.searchParams.delete('reason');
+            window.history.replaceState({}, document.title, url);
+        }
+
+        // Executar na carga da página
+        window.onload = () => {
+            const notification = getQueryParam('notification');
+            const reason = getQueryParam('reason');
+
+            if (notification === 'success') {
+                if (reason === 'update_sucess'){
+                    showNotification('Palavra-Passe redefinida com sucesso!', 'success');
+                } else {
+                    showNotification('Utilizador registado com sucesso!', 'success');
+                }
+            } else if (notification === 'error') {
+                if (reason === 'email_exists') {
+                    showNotification('O E-mail introduzido já está registado.', 'error');
+                } else if (reason === 'username_exists') {
+                    showNotification('O Nome de utilizador introduzido já está registado.', 'error');
+                } else if (reason === 'loginfailed') {
+                    showNotification('Entrada negada! Por favor introduza os dados corretamente.', 'error');
+                }
+            }
+
+            removeQueryParams();
+        };
+    </script>
+    <script>
+        function togglePasswordVisibility(passwordInputId, toggleIconId) {
+            var passwordInput = document.getElementById(passwordInputId);
+            var toggleIcon = document.getElementById(toggleIconId);
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = "password";
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
+    <script src="assets/js/script.js"></script>
+</body>
+
+</html>

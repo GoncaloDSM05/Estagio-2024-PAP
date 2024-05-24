@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="shortcut icon" type="imagex/png" href="images/logo.png">
+    <link rel="stylesheet" href="assets/css/stylelc.css ">
+    <title>Recuperar Palavra-Passe - SquadForge</title>
+</head>
+
+<body>
+    <div class="container" id="container">
+        <div class="form-container sign-in">
+            <form method="post" action="assets/php/pedidoRedefinirPP.php">
+                <h1>Recuperar a Palavra-Passe</h1>
+                <input type="email" name="email" placeholder="Email" required>
+                <button>Enviar email</button>
+            </form>
+        </div>
+        <div class="toggle-container">
+            <div class="toggle">
+                <div class="toggle-panel toggle-right">
+                    <h1>Recuperação da Palavra-Passe</h1>
+                    <p>Introduza o email associado à sua conta e enviaremos uma mensagem para a redefinição da palavra-passe.</p>
+                    <button class="hidden"><a href="conta.html">Voltar ao Entrar</a></button>
+                    <button class="hidden"><a href="index.html">Voltar ao inicio</a></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="notification" class="notification"></div>
+
+    <script>
+
+        function getQueryParam(param) {
+        let urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+        }
+
+        // Função para mostrar notificação
+        function showNotification(message, type) {
+            const notificationElement = document.createElement('div');
+            notificationElement.classList.add('notification', type);
+
+            // Adiciona ícones para diferentes tipos de notificação
+            const icon = document.createElement('i');
+            if (type === 'success') {
+                icon.classList.add('fa', 'fa-check-circle');
+                notificationElement.style.backgroundColor = '#4CAF50';
+            } else if (type === 'error') {
+                icon.classList.add('fa', 'fa-times-circle');
+                notificationElement.style.backgroundColor = '#f44336';
+            }
+
+            // Adiciona texto da notificação
+            const text = document.createTextNode(message);
+            
+            // Adiciona ícone e texto ao elemento de notificação
+            notificationElement.appendChild(icon);
+            notificationElement.appendChild(text);
+
+            document.body.appendChild(notificationElement);
+
+            // Mostra a notificação com animação
+            setTimeout(() => {
+                notificationElement.classList.add('show');
+            }, 10);
+
+            // Remove a notificação após 5 segundos
+            setTimeout(() => {
+                notificationElement.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(notificationElement);
+                }, 500);
+            }, 5000);
+        }
+
+        // Função para remover os parâmetros da URL
+        function removeQueryParams() {
+            const url = new URL(window.location);
+            url.searchParams.delete('notification');
+            url.searchParams.delete('reason');
+            window.history.replaceState({}, document.title, url);
+        }
+
+        // Executar na carga da página
+        window.onload = () => {
+            const notification = getQueryParam('notification');
+            const reason = getQueryParam('reason');
+
+            if (notification === 'success') {
+                showNotification('Email para a redefinição da Palavra-Passe enviado com sucesso!', 'success');
+            } else if (notification === 'error') {
+                if (reason === 'existingToken') {
+                    showNotification('Já existe um pedido em andamento de redefinição da Palavra-Passe, tente mais tarde.', 'error');
+                } else if (reason === 'notexistingEmail')
+                {
+                    showNotification('O Email introduzido não está registado na SquadForge!', 'error');
+                }
+            }
+
+            removeQueryParams();
+
+        };
+    </script>
+</body>
+
+</html>

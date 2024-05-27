@@ -275,13 +275,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet'>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.1/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/locales-all.min.js"></script>
     <link rel="shortcut icon" type="imagex/png" href="images/logo.png">
-    <script src="dist/index.global.min.js"></script>
-    <script src="core/locales/pt-br.global.min.js"></script>
-    <script src="assets/js/calendarjs.js"></script>
-    <link rel="stylesheet" href="assets/css/styled.css"> 
+    <link rel="stylesheet" href="assets/css/styled.css">
     <title>Dashboard - SquadForge</title>
 </head>
 
@@ -691,61 +690,11 @@
         </div>
 
         <div id="events" class="content">
-          
-            <div class="modal-opened hidden">
-                <div class="modal">
-                    <div class="modal-header">
-                        <div class="modal-title">
-                            <h3>Cadastrar Evento</h3>
-                        </div>
-                        <div class="modal-close">x</div>
-                    </div>
-                    <form action="assets/php/action-event.php" method="post" id="form-add-event">
-                        <div class="modal-body">
-                            <input type="hidden" name="id" id="id">
-                            <input type="hidden" name="action" id="action" value="">
-
-                            <label for="title">Nome do Evento</label>
-                            <input type="text" name="title" id="title">
-
-                            <label for="color">Selecione uma cor</label>
-                            <input type="color" name="color" id="color">
-
-                            <label for="start">Início do Evento</label>
-                            <input type="datetime-local" name="start" id="start">
-
-                            <label for="end">Término do Evento</label>
-                            <input type="datetime-local" name="end" id="end">
-
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn-save">Salvar</button>
-                            <button type="button" class="btn-delete hidden">Excluir</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div class="calendar-area">
-                <div class="calendar-area-header">
-                    <div class="msg">
-                        <?php
-                        if (!empty($_SESSION['msg'])) {
-                            echo $_SESSION['msg'];
-                            unset($_SESSION['msg']);
-                        }
-                        ?>
-                    </div>
-                </div>
+            <div id="calendar-container">
                 <div id='calendar'></div>
             </div>
-
-            <script src="dist/index.global.min.js"></script>
-            <script src="core/locales/pt-br.global.min.js"></script>
-            <script src="assets/js/calendarjs.js"></script>
-
         </div>
-
+        
         <div id="settings" class="content">  
 
             <div class="settings-container">
@@ -1061,6 +1010,75 @@
     </div>
 
     <script>
+        var calendarInitialized = false;
+
+        function initializeCalendar() {
+            if (calendarInitialized) return;
+            var calendarEl = document.getElementById('calendar');
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'pt-pt', // Certifique-se de usar o código de idioma correto
+                selectable: true,
+                editable: true,
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridDay'
+                },
+                buttonText: {
+                    today: 'Hoje',
+                    month: 'Mês',
+                    week: 'Semana',
+                    day: 'Dia',
+                    list: 'Lista'
+                },
+                select: function(info) {
+                    var title = prompt('Título do Evento:');
+                    var calendarApi = calendar;
+
+                    calendarApi.unselect(); // clear date selection
+
+                    if (title) {
+                        calendarApi.addEvent({
+                            title: title,
+                            start: info.startStr,
+                            end: info.endStr,
+                            allDay: info.allDay
+                        });
+                    }
+                },
+                events: [
+                    // Exemplos de eventos
+                    {
+                        title: 'Evento de Exemplo',
+                        start: '2024-05-27',
+                        color: '#6a0dad' // Cor roxa
+                    }
+                ]
+            });
+
+            calendar.render();
+            calendarInitialized = true;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Adiciona o evento de clique à aba "Eventos" para inicializar o calendário
+            document.querySelector('.item[onclick="changeContent(\'events\')"]').addEventListener('click', function() {
+                initializeCalendar();
+                setTimeout(clickTodayButton, 500); // Aguarda meio segundo antes de clicar no botão "Hoje"
+            });
+        });
+
+        function clickTodayButton() {
+            var todayButton = document.querySelector('.fc-button-today');
+            if (todayButton) {
+                todayButton.click();
+            } else {
+                console.log("Botão 'Hoje' não encontrado!");
+            }
+        }
+
         function changeContent(contentId) {
             // Esconde todos os elementos de conteúdo
             document.querySelectorAll('.content').forEach(function(content) {
@@ -1072,26 +1090,16 @@
             if (activeContent) {
                 activeContent.classList.add('active');
             }
-            // Seleciona o elemento span usando as classes
-            var span = document.querySelector(".fc-button.fc-button-today.fc-state-default.fc-corner-left.fc-corner-right");
 
-            // Verifica se o elemento existe para evitar erros
-            if (span) {
-                // Cria um evento de clique
-                var clickEvent = new MouseEvent("click", {
-                    bubbles: true,
-                    cancelable: false,
-                    view: window
-                });
-
-                // Dispara o evento de clique
-                span.dispatchEvent(clickEvent);
+            // Verifica se o calendário foi inicializado e se o botão "Hoje" está disponível
+            if (calendarInitialized) {
+                clickTodayButton();
             } else {
-                console.log("Elemento não encontrado!");
+                console.log("Calendário não inicializado!");
             }
-            
         }
     </script>
+
 
 
     <script>

@@ -1251,52 +1251,100 @@ button.danger:hover {
     margin-top: 20px;
 }
 
-.calendar-area {
-    margin: 40px 10px;
-    padding: 0;
+#calendar-container {
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    width: 100%; /* Ocupar toda a largura disponível */
+    margin: 40px auto; /* Margens automáticas para centralizar */
 }
 
-#calendar,
-.calendar-area-header {
-    max-width: 1100px;
+#calendar {
+    max-width: 100%;
     margin: 0 auto;
 }
 
-.modal-body input[type="color"] {
-    width: 50px;
-    height: 50px;
+.fc-scroller.fc-scroller-liquid-absolute {
+    overflow: auto !important;
 }
 
-.btn-delete {
-    background-color: rgb(255, 100, 100) !important;
-    border: 1px solid rgb(255, 100, 100) !important;
-}
 
-.btn-delete:hover {
-    background-color: rgb(255, 120, 100) !important;
-    border: 1px solid rgb(255, 120, 100) !important;
-}
-
-.hidden {
-    display: none;
-}
-
-.alert-danger {
-    background-color: lightcoral;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 600;
+.fc-toolbar {
+    background-color: #5e3bee;
+    color: white;
+    border-radius: 8px 8px 0 0;
     padding: 10px;
-    margin: 10px 0;
-    border-radius: 6px;
 }
 
-.alert-success {
-    background-color: green;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 6px;
+.fc-toolbar .fc-prev-button,
+.fc-toolbar .fc-next-button,
+.fc-toolbar .fc-today-button {
+    color: white !important; /* Altera a cor dos botões para branco */
 }
+
+.fc-toolbar .fc-button-primary {
+    color: white !important; /* Mantém o texto dos botões de data em branco */
+}
+
+.fc-event {
+    background-color: #5e3bee !important;
+    border-color: #5e3bee !important;
+    border-radius: 4px;
+    color: white;
+    padding: 2px 5px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.fc-daygrid-event-dot {
+    border-color: #5e3bee;
+}
+
+.fc-daygrid-day-number {
+    color: #5e3bee;
+}
+
+.fc-today {
+    background-color: #f4e1ff !important;
+}
+
+.fc-daygrid-day {
+    padding: 10px 12px; /* Adiciona um pouco mais de espaçamento horizontal */
+}
+
+.fc-daygrid-day-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fc-daygrid-day-events {
+    margin-top: 5px;
+}
+
+.fc-scrollgrid {
+    border: none; /* Remove as bordas ao redor do calendário */
+}
+
+.fc-theme-standard th, .fc-theme-standard td {
+    border: 1px solid #e0e0e0;
+}
+
+.fc-col-header-cell-cushion {
+    font-size: 16px;
+    font-weight: bold;
+    color: #5e3bee;
+}
+
+.fc-daygrid-day-number {
+    font-size: 14px;
+}
+
+.fc-daygrid-block-event .fc-event-title {
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+

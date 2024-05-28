@@ -151,7 +151,6 @@ function transferirAdmin($adminId, $userId, $password) {
 
 function exitMember($userId) {
     global $mysqli;
-
     $queryCheckOwner = "SELECT codgrupo FROM grupos WHERE idutilizadorDono = ?";
     $stmtCheckOwner = $mysqli->prepare($queryCheckOwner);
     $stmtCheckOwner->bind_param('i', $userId);
@@ -202,8 +201,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         } elseif ($action === 'exitMember') {
             if (isset($_POST['userId'])) {
-                $userIdToExit = $_POST['userId'];
-                exitMember($userIdToExit);
+                exitMember($userId);
             }
         }
     }

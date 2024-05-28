@@ -854,7 +854,7 @@
                     <div class="modal-body">
                         <form id="exitMemberForm" method="post" action="assets/php/verificaDefinicoes.php">
                             <input type="hidden" name="action" value="exitMember">
-                            <input type="hidden" id="removeUserId" name="userId">
+                            <input type="hidden" id="exitUserId" name="userId">
                             <label for="removePassword">Deseja sair do grupo?</label>
                             <button type="submit" class="danger">Sair</button>
                             <button type="button" class="secondary" onclick="closeModal('confirmExitGroup')">Cancelar</button>
@@ -1209,6 +1209,8 @@
                     showNotification('A data introduzida é inválida, tente novamente.', 'error');
                 } else if (reason === 'dataInvalida2') {
                     showNotification('A data limite não pode ser superior a 3 anos da data atual, tente novamente.', 'error');
+                } else if (reason === 'ultimoMembro'){
+                    showNotification('Você não pode sair do grupo porque é a única pessoa do grupo.', 'error');
                 }
             }
 

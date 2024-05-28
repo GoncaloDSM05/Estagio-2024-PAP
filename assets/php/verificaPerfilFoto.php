@@ -34,7 +34,7 @@ function uploadFoto($foto) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Verificar se o usuário está logado
     if (!isset($_SESSION['idutilizador'])) {
-        header("Location: login.php");
+        header("Location: ../../conta.html");
         exit;
     }
 

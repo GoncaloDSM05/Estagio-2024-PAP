@@ -3,7 +3,7 @@
     session_start();
 
     if (!isset($_SESSION['idutilizador'])) {
-        header(" Location: conta.html");
+        header("Location: conta.html");
         exit();
     }
 

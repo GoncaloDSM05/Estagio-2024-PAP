@@ -23,7 +23,8 @@
             <div class="toggle">
                 <div class="toggle-panel toggle-right">
                     <h1>Recuperação da Palavra-Passe</h1>
-                    <p>Introduza o email associado à sua conta e enviaremos uma mensagem para a redefinição da palavra-passe.</p>
+                    <p>Introduza o email associado à sua conta e enviaremos uma mensagem para a redefinição da
+                        palavra-passe.</p>
                     <button class="hidden"><a href="conta.html">Voltar ao Entrar</a></button>
                     <button class="hidden"><a href="index.html">Voltar ao inicio</a></button>
                 </div>
@@ -35,8 +36,8 @@
     <script>
 
         function getQueryParam(param) {
-        let urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(param);
+            let urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
         }
 
         // Função para mostrar notificação
@@ -56,7 +57,7 @@
 
             // Adiciona texto da notificação
             const text = document.createTextNode(message);
-            
+
             // Adiciona ícone e texto ao elemento de notificação
             notificationElement.appendChild(icon);
             notificationElement.appendChild(text);
@@ -95,8 +96,7 @@
             } else if (notification === 'error') {
                 if (reason === 'existingToken') {
                     showNotification('Já existe um pedido em andamento de redefinição da Palavra-Passe, tente mais tarde.', 'error');
-                } else if (reason === 'notexistingEmail')
-                {
+                } else if (reason === 'notexistingEmail') {
                     showNotification('O Email introduzido não está registado na SquadForge!', 'error');
                 }
             }

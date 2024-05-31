@@ -35,8 +35,8 @@
     <div id="notification" class="notification"></div>
 
     <script>
-        
-        
+
+
         function getQueryParam(param) {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(param);
@@ -59,7 +59,7 @@
 
             // Adiciona texto da notificação
             const text = document.createTextNode(message);
-            
+
             // Adiciona ícone e texto ao elemento de notificação
             notificationElement.appendChild(icon);
             notificationElement.appendChild(text);
@@ -87,13 +87,13 @@
             url.searchParams.delete('reason');
             window.history.replaceState({}, document.title, url);
         }
-        
+
         // Executar na carga da página
         window.onload = () => {
 
             // Extrai o token da URL
             const token = getQueryParam('token');
-            
+
             // Define o valor do campo oculto com o token
             const tokenF = document.getElementById('tokenF');
             if (tokenF && token) {
@@ -108,7 +108,7 @@
                     showNotification('A redefinição da Palava-Passe falhou inesperadamente, tente mais tarde.', 'error');
                 } else if (reason === 'token_expired_or_invalid') {
                     showNotification('O pedido para a redefinição da Palavra-Passe é inválido ou expirou, volte a fazer o pedido.', 'error');
-                } else if (reason === 'password_mismatch'){
+                } else if (reason === 'password_mismatch') {
                     showNotification('As Palavras-Passes não são iguais, volte a introduzi-las.', 'error');
                 }
             }
@@ -118,4 +118,5 @@
         };
     </script>
 </body>
+
 </html>

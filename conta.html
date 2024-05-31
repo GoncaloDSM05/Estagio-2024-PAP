@@ -23,7 +23,8 @@
                 <input type="text" name="nfuncao" placeholder="Nome da Função" required>
                 <input type="email" name="email" placeholder="Email" required>
                 <input type="password" name="palavrapasse" id="palavrapasse" placeholder="Palavra-Passe" required>
-                <button type="button" onclick="togglePasswordVisibility('palavrapasse', 'toggleIcon1')" class="password-toggle">
+                <button type="button" onclick="togglePasswordVisibility('palavrapasse', 'toggleIcon1')"
+                    class="password-toggle">
                     <i id="toggleIcon1" class="fas fa-eye"></i>
                 </button>
                 <button>Criar</button>
@@ -35,7 +36,8 @@
                 <input type="hidden" name="action" value="login">
                 <input type="text" name="emailnomeutilizador" placeholder="Email ou Nome de utilizador" required>
                 <input type="password" name="palavrapasse" id="palavrapassee" placeholder="Palavra-Passe" required>
-                <button type="button" onclick="togglePasswordVisibility('palavrapassee', 'toggleIcon2')" class="password-toggle">
+                <button type="button" onclick="togglePasswordVisibility('palavrapassee', 'toggleIcon2')"
+                    class="password-toggle">
                     <i id="toggleIcon2" class="fas fa-eye"></i>
                 </button>
                 <a href="pedidoredefinirpp.html">Esqueceu-se da sua palavra-passe?</a>
@@ -64,8 +66,8 @@
     <script>
 
         function getQueryParam(param) {
-        let urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(param);
+            let urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
         }
 
         // Função para mostrar notificação
@@ -85,7 +87,7 @@
 
             // Adiciona texto da notificação
             const text = document.createTextNode(message);
-            
+
             // Adiciona ícone e texto ao elemento de notificação
             notificationElement.appendChild(icon);
             notificationElement.appendChild(text);
@@ -120,7 +122,7 @@
             const reason = getQueryParam('reason');
 
             if (notification === 'success') {
-                if (reason === 'update_sucess'){
+                if (reason === 'update_sucess') {
                     showNotification('Palavra-Passe redefinida com sucesso!', 'success');
                 } else {
                     showNotification('Utilizador registado com sucesso!', 'success');

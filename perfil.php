@@ -1,32 +1,33 @@
 <?php
-    include 'assets/php/conecta.php';
-    session_start();
+include 'assets/php/conecta.php';
+session_start();
 
-    if (!isset($_SESSION['idutilizador'])) {
-        header("Location: conta.html");
-        exit();
-    }
+if (!isset($_SESSION['idutilizador'])) {
+    header("Location: conta.html");
+    exit();
+}
 
-    $idutilizador = $_SESSION['idutilizador'];
+$idutilizador = $_SESSION['idutilizador'];
 
-    $query = $mysqli->prepare("SELECT * FROM utilizadores WHERE idutilizador = ?");
-    if ($query === false) {
-        die("Erro preparando a query: " . $mysqli->error);
-    }
+$query = $mysqli->prepare("SELECT * FROM utilizadores WHERE idutilizador = ?");
+if ($query === false) {
+    die("Erro preparando a query: " . $mysqli->error);
+}
 
-    $query->bind_param("i", $idutilizador);
-    $query->execute();
-    $result = $query->get_result();
+$query->bind_param("i", $idutilizador);
+$query->execute();
+$result = $query->get_result();
 
-    if ($result->num_rows > 0) {
-        $user = $result->fetch_assoc();
-    } else {
-        die("Utilizador não encontrado.");
-    }
+if ($result->num_rows > 0) {
+    $user = $result->fetch_assoc();
+} else {
+    die("Utilizador não encontrado.");
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,6 +39,7 @@
     <link rel="stylesheet" href="assets/css/stylep.css">
     <title>Perfil - SquadForge</title>
 </head>
+
 <body>
     <div class="container">
         <div class="row gutters">
@@ -63,10 +65,10 @@
                         </div>
                     </div>
                 </div>
-                </div>
-                <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
-                    <div class="card h-100">
-                        <div class="card-body">
+            </div>
+            <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+                <div class="card h-100">
+                    <div class="card-body">
                         <form action="assets/php/verificaPerfil.php" method="POST">
                             <input type="hidden" name="action" value="updateProfile">
                             <div class="row gutters">
@@ -138,7 +140,7 @@
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="passwordModalLabel">Atualizar Palavra-passe</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
+                                        <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div class="modal-body">
@@ -195,7 +197,7 @@
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="profilePicModalLabel">Alterar Foto de Perfil</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
+                                        <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div class="modal-body">
@@ -247,11 +249,11 @@
 
     <script>
         document.getElementById('palavra-passe').addEventListener('click', function() {
-        $('#passwordModal').modal('show');
+            $('#passwordModal').modal('show');
         });
 
         document.getElementById('fotoperfil').addEventListener('click', function() {
-        $('#profilePicModal').modal('show');
+            $('#profilePicModal').modal('show');
         });
     </script>
 
@@ -290,10 +292,9 @@
 
 
     <script>
-
         function getQueryParam(param) {
-        let urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(param);
+            let urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
         }
 
         // Função para mostrar notificação
@@ -313,7 +314,7 @@
 
             // Adiciona texto da notificação
             const text = document.createTextNode(message);
-            
+
             // Adiciona ícone e texto ao elemento de notificação
             notificationElement.appendChild(icon);
             notificationElement.appendChild(text);
@@ -348,7 +349,7 @@
             const reason = getQueryParam('reason');
 
             if (notification === 'success') {
-                if (reason === 'sucessoImagem'){
+                if (reason === 'sucessoImagem') {
                     showNotification('A foto de perfil foi alterada com sucesso!', 'success');
                 } else if (reason === "sucessoAPP") {
                     showNotification('A palavra-passe foi alterada com sucesso!', 'success');
@@ -375,8 +376,8 @@
 
             removeQueryParams();
         };
-
     </script>
 
 </body>
+
 </html>

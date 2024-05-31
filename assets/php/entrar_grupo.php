@@ -39,4 +39,5 @@ if ($stmt->num_rows == 1) {
 
 $stmt->close();
 $mysqli->close();
+
 ?>

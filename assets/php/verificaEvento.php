@@ -20,8 +20,8 @@ function buscarGrupo($userId)
     }
 }
 
-// Verifica se a variável de ação está definida e se é uma solicitação POST
-$action = $_POST['action'] ?? '';
+// Verifica se a variável de ação está definida e se é uma solicitação POST ou GET
+$action = $_REQUEST['action'] ?? '';
 
 if ($action == 'addEvent' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // Adicionar Evento
@@ -52,13 +52,13 @@ if ($action == 'addEvent' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: ../../dashboard.php?notification=error&reason=camposInvalidos");
         exit();
     }
-} elseif ($action == 'fetch_events') {
+} elseif ($action == 'fetch_events' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     // Buscar Eventos
     $codgrupo = buscarGrupo($userId);
 
-    if ($codgrupo !== null) {
+    if ($codgrupo != null) {
         $query = $mysqli->prepare("SELECT titulo, cor, inicio, fim FROM eventos WHERE codgrupo = ?");
-        $query->bind_param('s', $codgrupo);
+        $query->bind_param('i', $codgrupo); // 'i' para indicar que é um inteiro
         $query->execute();
         $result = $query->get_result();
 
@@ -78,3 +78,5 @@ if ($action == 'addEvent' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 echo json_encode(['error' => 'Requisição inválida']);
+exit();
+?>

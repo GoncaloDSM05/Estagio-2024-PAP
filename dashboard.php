@@ -337,7 +337,7 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                     <div class="separator">
                         <div class="info">
                             <h3>Tarefas</h3>
-                            <a href="#" onclick="changeContent('tasks')">Ver Tudo</a>
+                            <a href="#" onclick="changeContentA('tasks', 'tasks-nav')">Ver Tudo</a>
                         </div>
                     </div>
 
@@ -387,7 +387,7 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                     <div class="separator">
                         <div class="info">
                             <h3>Eventos</h3>
-                            <a href="#" onclick="changeContent('events')">Ver Tudo</a>
+                            <a href="#" onclick="changeContentA('events', 'events-nav')">Ver Tudo</a>
                         </div>
                         <input type="date" value="2023-10-15">
                     </div>
@@ -1070,7 +1070,13 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                         document.getElementById("event-modal").style.display = "block";
                     },
 
-                    events: 'assets/php/verificaEvento.php?action=fetch_events'
+                    events: 'assets/php/verificaEvento.php?action=fetch_events',
+                    eventDidMount: function(info) {
+                        // Change event background color
+                        info.el.style.backgroundColor = info.event.backgroundColor;
+                        // Change event text color
+                        info.el.style.color = info.event.textColor || 'white';
+                    }
                 });
 
                 calendar.render();
@@ -1116,6 +1122,11 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                 if (event.target.className === 'modal') {
                     event.target.style.display = 'none';
                 }
+            }
+
+            function changeContentA(contentId, navId) {
+                var navElement = document.getElementById(navId);
+                changeContent(contentId, navElement);
             }
         </script>
 

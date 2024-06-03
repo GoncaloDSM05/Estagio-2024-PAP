@@ -34,6 +34,19 @@ function buscarGrupoEMembros($userId) {
     }
 }
 
+// Função para buscar o nome do usuário (primeiro nome + último nome)
+function buscarNomeUsuario($userId) {
+    global $mysqli;
+    $query = "SELECT primeironome, ultimonome FROM utilizadores WHERE idutilizador = ?";
+    $stmt = $mysqli->prepare($query);
+    $stmt->bind_param('i', $userId);
+    $stmt->execute();
+    $stmt->bind_result($primeiroNome, $ultimoNome);
+    $stmt->fetch();
+    $stmt->close();
+    return $primeiroNome . " " . $ultimoNome;
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'send') {
     // Enviar mensagem
     $userId = intval($_POST['user']);
@@ -59,12 +72,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     }
 } else {
     // Carregar mensagens
-    $groupCode = isset($_GET['group']) ? $_GET['group'] : null;
+    $userId = intval($_GET['user']);
+    $groupCode = buscarGrupoEMembros($userId);
 
     if ($groupCode !== null) {
         $sql = "SELECT * FROM chats WHERE codgrupo = ? ORDER BY datahora";
         $stmt = $mysqli->prepare($sql);
-        $stmt->bind_param('s', $groupCode);
+        $stmt->bind_param('i', $groupCode);
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -74,15 +88,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
                 $encryptedMessage = $row['conteudo'];
                 $timestamp = $row['datahora'];
                 $avatar = strtoupper(substr($user, 0, 1));
-                $isCurrentUser = (isset($_POST['user']) && $_POST['user'] == $user) ? " user" : "";
+                $isCurrentUser = ($userId == $user) ? " user" : "";
 
                 // Desencriptar a mensagem
-                $message = decryptMessage($encryptedMessage);
+                $message = decryptMessage($row['conteudo']);
 
-                echo "<div class='message$isCurrentUser'>";
-                echo "<div class='avatar'>$avatar</div>";
+                // Buscar o nome do usuário
+                $nomeUsuario = buscarNomeUsuario($user);
+
+                echo "<p><strong>$nomeUsuario:</strong> $message</p>";
                 echo "<div class='content'>";
-                echo "<p>$message</p>";
                 echo "<div class='timestamp'>$timestamp</div>";
                 echo "</div>";
                 echo "</div>";

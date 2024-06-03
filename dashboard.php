@@ -284,6 +284,7 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
         <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/locales-all.min.js"></script>
         <link rel="stylesheet" href="assets/css/styled.css">
+        <link rel="shortcut icon" type="imagex/png" href="images/logo.png">
         <title>Dashboard - SquadForge</title>
     </head>
 
@@ -445,7 +446,61 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
             </div>
 
             <div id="chat" class="content">
-                chat
+                <div id="chat-container">
+                    <div id="left-panel">
+                        <div id="chat-box"></div>
+                        <div id="input-container">
+                            <input type="text" id="message" placeholder="Digite a sua mensagem">
+                            <button id="send" data-tooltip="Enviar mensagem"><i class="fas fa-paper-plane icon"></i></button>
+                            <button id="video-call" data-tooltip="Começar videochamada"><i class="fas fa-video icon"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                <script>
+                    $(document).ready(function() {
+                        var userId = <?php echo $idutilizador; ?>;
+
+                        function loadMessages() {
+                            var user = userId;
+                            $.ajax({
+                                url: 'assets/php/verificaChat.php',
+                                method: 'GET',
+                                data: {
+                                    user: user
+                                },
+                                success: function(data) {
+                                    $('#chat-box').html(data);
+                                    $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+                                }
+                            });
+                        }
+
+                        $('#send').click(function() {
+                            var message = $('#message').val();
+                            if (message.trim() !== "") {
+                                $.ajax({
+                                    url: 'assets/php/verificaChat.php',
+                                    method: 'POST',
+                                    data: {
+                                        action: 'send',
+                                        user: userId,
+                                        message: message
+                                    },
+                                    success: function(data) {
+                                        $('#message').val("");
+                                        loadMessages();
+                                    }
+                                });
+                            }
+                        });
+
+                        setInterval(loadMessages, 1000);
+                        loadMessages();
+                    });
+                </script>
+
             </div>
 
             <div id="tasks" class="content">

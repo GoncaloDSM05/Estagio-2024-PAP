@@ -1460,3 +1460,121 @@ button.danger:hover {
 #event-form button:hover {
     background-color: #4e33c0;
 }
+
+#chat-container {
+    width: 100%;
+    max-width: 800px;
+    height: 90vh; /* Aumentando a altura para 90% da altura da janela de visualização */
+    margin: 20px auto;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    overflow: hidden;
+}
+
+#left-panel {
+    flex: 1; /* Expandindo o painel esquerdo para ocupar todo o espaço disponível */
+    display: flex;
+    flex-direction: column;
+}
+
+#chat-box {
+    flex: 1;
+    padding: 20px;
+    overflow-y: scroll;
+}
+
+.message {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.message .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #5e3bee;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.message .content {
+    padding: 10px;
+    border-radius: 10px;
+    position: relative;
+    max-width: calc(100% - 50px);
+}
+
+.message .content p {
+    margin: 0;
+}
+
+.content.left .timestamp {
+    left: 10px;
+}
+
+.content.right .timestamp {
+    right: 10px;
+}
+
+.message.user .content {
+    margin-left: auto;
+}
+
+#input-container {
+    display: flex;
+    padding: 10px;
+    background: #fafafa;
+    border-top: 1px solid #ccc;
+    align-items: center; /* Alinhando os elementos verticalmente */
+}
+
+#message {
+    flex: 1;
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#send, #video-call {
+    padding: 8px; /* Reduzindo o preenchimento dos botões */
+    background: #5e3bee;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px;
+    transition: background-color 0.3s;
+    position: relative; /* Alterando para posição relativa */
+}
+
+#send:hover::after, #video-call:hover::after {
+    content: attr(data-tooltip); /* Exibindo o atributo data-tooltip como conteúdo */
+    position: absolute;
+    bottom: calc(100% + 5px); /* Ajustando a posição do tooltip */
+    left: 50%; /* Centralizando o tooltip */
+    transform: translateX(-50%); /* Centralizando o tooltip */
+    padding: 4px 8px; /* Espaçamento interno do tooltip */
+    background: rgba(0, 0, 0, 0.8); /* Cor de fundo do tooltip */
+    color: #fff; /* Cor do texto do tooltip */
+    border-radius: 4px; /* Raio da borda do tooltip */
+    font-size: 12px; /* Tamanho da fonte do tooltip */
+    white-space: nowrap; /* Impedindo que o texto do tooltip quebre */
+    z-index: 999; /* Garantindo que o tooltip esteja acima de outros elementos */
+    opacity: 0; /* Inicialmente, o tooltip é invisível */
+    transition: opacity 0.3s; /* Adicionando transição de opacidade */
+}
+
+#send:hover::after, #video-call:hover::after {
+    opacity: 1; /* Tornando o tooltip visível ao passar o mouse */
+}
+
+.icon {
+    font-size: 16px; /* Reduzindo o tamanho dos ícones */
+}

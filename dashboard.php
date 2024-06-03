@@ -283,7 +283,6 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/locales-all.min.js"></script>
-        <link rel="shortcut icon" type="imagex/png" href="images/logo.png">
         <link rel="stylesheet" href="assets/css/styled.css">
         <title>Dashboard - SquadForge</title>
     </head>
@@ -725,6 +724,34 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                 </div>
             </div>
 
+            <div id="event-info-modal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Detalhes do Evento</h2>
+                        <span class="close" onclick="closeModal('event-info-modal')">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <form id="event-info-form" action="assets/php/verificaEvento.php" method="POST">
+                            <input type="hidden" id="event-id" name="id">
+                            <label for="event-title">Título do Evento:</label>
+                            <input type="text" id="event-title" name="title" required>
+
+                            <label for="event-color">Cor:</label>
+                            <input type="color" id="event-color" name="color" required>
+
+                            <label for="event-start">Hora de Início:</label>
+                            <input type="datetime-local" id="event-start" name="start" required>
+
+                            <label for="event-end">Hora de Término:</label>
+                            <input type="datetime-local" id="event-end" name="end" required>
+
+                            <button type="submit">Salvar</button>
+                            <button type="button" onclick="removeEvent()">Remover</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
 
             <div id="settings" class="content">
 
@@ -1033,6 +1060,44 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
         <script>
             var calendarInitialized = false;
 
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelector('.item[onclick="changeContent(\'events\')"]').addEventListener('click', function() {
+                    changeContent('events');
+                    initializeCalendar();
+                    setTimeout(clickTodayButton, 500);
+                });
+            });
+
+            function updateEvent(event) {
+                fetch('assets/php/verificaEvento.php?action=updateEvent', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'id=' + encodeURIComponent(event.id) +
+                            '&title=' + encodeURIComponent(event.title) +
+                            '&start=' + encodeURIComponent(event.start.toISOString()) +
+                            '&end=' + encodeURIComponent(event.end ? event.end.toISOString() : '') +
+                            '&color=' + encodeURIComponent(event.backgroundColor),
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro ao atualizar o evento');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (!data.success) {
+                            console.error('Erro: ', data.error);
+                        } else {
+                            console.log('Evento atualizado com sucesso');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao atualizar o evento:', error);
+                    });
+            }
+
             function initializeCalendar() {
                 if (calendarInitialized) return;
                 var calendarEl = document.getElementById('calendar');
@@ -1040,6 +1105,7 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                 var calendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'dayGridMonth',
                     locale: 'pt-pt',
+                    timeZone: 'Europe/Lisbon', // Correção do fuso horário
                     selectable: true,
                     editable: true,
                     headerToolbar: {
@@ -1063,42 +1129,66 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                             return;
                         }
 
-                        // Preencher o campo oculto com a data selecionada
                         document.getElementById('selectedDate').value = info.startStr;
-
-                        // Exibir o modal de evento
                         document.getElementById("event-modal").style.display = "block";
                     },
-
                     events: 'assets/php/verificaEvento.php?action=fetch_events',
                     eventDidMount: function(info) {
-                        // Change event background color
                         info.el.style.backgroundColor = info.event.backgroundColor;
-                        // Change event text color
                         info.el.style.color = info.event.textColor || 'white';
+                    },
+                    eventDrop: function(info) {
+                        var today = new Date().setHours(0, 0, 0, 0);
+                        var start = new Date(info.event.start).setHours(0, 0, 0, 0);
+                        if (start < today) {
+                            alert("Não pode mover eventos para datas anteriores a hoje.");
+                            info.revert();
+                        } else {
+                            updateEvent(info.event);
+                        }
+                    },
+                    eventResize: function(info) {
+                        var today = new Date().setHours(0, 0, 0, 0);
+                        var start = new Date(info.event.start).setHours(0, 0, 0, 0);
+                        if (start < today) {
+                            alert("Não pode redimensionar eventos para datas anteriores a hoje.");
+                            info.revert();
+                        } else {
+                            updateEvent(info.event);
+                        }
+                    },
+                    eventConstraint: {
+                        start: '00:00', // Use this to define your business hours
+                        end: '24:00' // Use this to define your business hours
+                    },
+                    eventAllow: function(dropInfo, draggedEvent) {
+                        var today = new Date().setHours(0, 0, 0, 0);
+                        var start = new Date(dropInfo.start).setHours(0, 0, 0, 0);
+                        if (start < today) {
+                            alert("Não pode mover eventos para datas anteriores a hoje.");
+                            return false;
+                        }
+                        return true;
+                    },
+                    eventDrop: function(info) {
+                        var today = new Date();
+                        var selectedDate = new Date(info.event.start);
+                        if (selectedDate < today) {
+                            alert("Não pode arrastar eventos para datas anteriores a hoje.");
+                            info.revert();
+                        } else {
+                            updateEvent(info.event);
+                        }
                     }
                 });
 
                 calendar.render();
                 calendarInitialized = true;
+
             }
 
             function closeModal(modalId) {
                 document.getElementById(modalId).style.display = 'none';
-            }
-
-            document.addEventListener('DOMContentLoaded', function() {
-                document.querySelector('.item[onclick="changeContent(\'events\')"]').addEventListener('click', function() {
-                    initializeCalendar();
-                    setTimeout(clickTodayButton, 500);
-                });
-            });
-
-            function clickTodayButton() {
-                var todayButton = document.querySelector('.fc-button-today');
-                if (todayButton) {
-                    todayButton.click();
-                }
             }
 
             function changeContent(contentId) {
@@ -1118,18 +1208,19 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                 }
             }
 
+            function clickTodayButton() {
+                var todayButton = document.querySelector('.fc-button-today');
+                if (todayButton) {
+                    todayButton.click();
+                }
+            }
+
             window.onclick = function(event) {
                 if (event.target.className === 'modal') {
                     event.target.style.display = 'none';
                 }
             }
-
-            function changeContentA(contentId, navId) {
-                var navElement = document.getElementById(navId);
-                changeContent(contentId, navElement);
-            }
         </script>
-
 
         <script>
             function getQueryParam(param) {

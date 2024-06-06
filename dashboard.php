@@ -336,114 +336,67 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
 
                     <div class="separator">
                         <div class="info">
-                            <h3>Tarefas</h3>
-                            <a href="#" onclick="changeContentA('tasks', 'tasks-nav')">Ver Tudo</a>
+                            <h3>Atividades</h3>
+                            <a href="#" onclick="changeContentA('activities', 'activities-nav')">Ver Tudo</a>
                         </div>
                     </div>
 
-                    <div class="analytics">
-                        <div class="item">
-                            <div class="progress">
-                                <div class="info">
-                                    <h5>Locations</h5>
-                                    <p>35 Lessons</p>
-                                </div>
-                                <div class="progress-bar" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <i class='bx bx-map-pin'></i>
-                        </div>
-                        <div class="item">
-                            <div class="progress">
-                                <div class="info">
-                                    <h5>People</h5>
-                                    <p>30 Lessons</p>
-                                </div>
-                                <div class="progress-bar" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <i class='bx bx-user-voice'></i>
-                        </div>
-                        <div class="item">
-                            <div class="progress">
-                                <div class="info">
-                                    <h5>Airport</h5>
-                                    <p>45 Lessons</p>
-                                </div>
-                                <div class="progress-bar" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <i class='bx bxs-plane-land'></i>
-                        </div>
-                        <div class="item">
-                            <div class="progress">
-                                <div class="info">
-                                    <h5>Places</h5>
-                                    <p>20 Lessons</p>
-                                </div>
-                                <div class="progress-bar" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <i class='bx bxs-castle'></i>
-                        </div>
+                    <?php
+                    // Consulta SQL para contar o número de tarefas e eventos do grupo
+                    $sqlAtividades = "SELECT tipo, COUNT(*) AS total FROM (SELECT 'Tarefa' AS tipo FROM tarefasg WHERE codgrupo = ? UNION ALL SELECT 'Evento' AS tipo FROM eventos WHERE codgrupo = ?) AS atividades GROUP BY tipo";
+                    $stmtAtividades = $mysqli->prepare($sqlAtividades);
+                    $stmtAtividades->bind_param('ii', $groupId, $groupId);
+                    $stmtAtividades->execute();
+                    $resultAtividades = $stmtAtividades->get_result();
+                    ?>
+
+                    <div class="chart-container">
+                        <canvas id="produtividade-chart"></canvas>
                     </div>
 
-                    <div class="separator">
-                        <div class="info">
-                            <h3>Eventos</h3>
-                            <a href="#" onclick="changeContentA('events', 'events-nav')">Ver Tudo</a>
-                        </div>
-                        <input type="date" value="2023-10-15">
-                    </div>
-
-                    <div class="planning">
-                        <div class="item">
-                            <div class="left">
-                                <div class="icon">
-                                    <i class='bx bx-book-alt'></i>
-                                </div>
-                                <div class="details">
-                                    <h5>Reading - Topic 1</h5>
-                                    <p>8:00 - 10:00</p>
-                                </div>
-                            </div>
-                            <i class='bx bx-dots-vertical-rounded'></i>
-                        </div>
-                        <div class="item">
-                            <div class="left">
-                                <div class="icon">
-                                    <i class='bx bx-edit-alt'></i>
-                                </div>
-                                <div class="details">
-                                    <h5>Writing - Topic 2</h5>
-                                    <p>13:00 - 14:00</p>
-                                </div>
-                            </div>
-                            <i class='bx bx-dots-vertical-rounded'></i>
-                        </div>
-                        <div class="item">
-                            <div class="left">
-                                <div class="icon">
-                                    <i class='bx bx-headphone'></i>
-                                </div>
-                                <div class="details">
-                                    <h5>Listening - Topic 1</h5>
-                                    <p>15:00 - 16:00</p>
-                                </div>
-                            </div>
-                            <i class='bx bx-dots-vertical-rounded'></i>
-                        </div>
-                        <div class="item">
-                            <div class="left">
-                                <div class="icon">
-                                    <i class='bx bx-volume-low'></i>
-                                </div>
-                                <div class="details">
-                                    <h5>Listening - Topic 2</h5>
-                                    <p>19:00 - 20:00</p>
-                                </div>
-                            </div>
-                            <i class='bx bx-dots-vertical-rounded'></i>
-                        </div>
-                    </div>
+                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                    <script>
+                        var ctx = document.getElementById('produtividade-chart').getContext('2d');
+                        var myChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: ['Tarefas', 'Eventos'],
+                                datasets: [{
+                                    label: 'Total',
+                                    data: [
+                                        <?php
+                                        $rowTarefas = mysqli_fetch_assoc($resultAtividades);
+                                        echo $rowTarefas['total'] ?? '0'; ?>,
+                                        <?php
+                                        $rowEventos = mysqli_fetch_assoc($resultAtividades);
+                                        echo $rowEventos['total'] ?? '0'; ?>
+                                    ],
+                                    backgroundColor: [
+                                        'rgba(54, 162, 235, 0.2)',
+                                        'rgba(255, 99, 132, 0.2)'
+                                    ],
+                                    borderColor: [
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 99, 132, 1)'
+                                    ],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    </script>
                 </main>
             </div>
+
+
 
             <div id="chat" class="content">
                 <div id="chat-container">
@@ -496,12 +449,18 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                             }
                         });
 
+                        $('#message').on('keypress', function(event) {
+                            if (event.which === 13) {
+                                $('#send').click();
+                            }
+                        });
+
                         setInterval(loadMessages, 1000);
                         loadMessages();
                     });
                 </script>
-
             </div>
+
 
             <div id="tasks" class="content">
                 <h1>Gerenciador de Tarefas</h1>
@@ -1037,17 +996,43 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
             include 'assets/php/conecta.php';
 
             // Consulta SQL para contar o número de tarefas criadas
-            $sqlTarefasCriadas = "SELECT COUNT(*) AS totalCriadas FROM tarefasg WHERE codgrupo = '$groupId'";
-            $resultTarefasCriadas = mysqli_query($mysqli, $sqlTarefasCriadas);
-            $rowTarefasCriadas = mysqli_fetch_assoc($resultTarefasCriadas);
+            $sqlTarefasCriadas = "SELECT COUNT(*) AS totalCriadas FROM tarefasg WHERE codgrupo = ?";
+            $stmtTarefasCriadas = $mysqli->prepare($sqlTarefasCriadas);
+            $stmtTarefasCriadas->bind_param('i', $groupId);
+            $stmtTarefasCriadas->execute();
+            $resultTarefasCriadas = $stmtTarefasCriadas->get_result();
+            $rowTarefasCriadas = $resultTarefasCriadas->fetch_assoc();
             $totalTarefasCriadas = $rowTarefasCriadas['totalCriadas'];
 
             // Consulta SQL para contar o número de tarefas finalizadas
-            $sqlTarefasFinalizadas = "SELECT COUNT(*) AS totalFinalizadas FROM tarefasg WHERE codgrupo = '$groupId' AND estado = 'terminada'";
-            $resultTarefasFinalizadas = mysqli_query($mysqli, $sqlTarefasFinalizadas);
-            $rowTarefasFinalizadas = mysqli_fetch_assoc($resultTarefasFinalizadas);
+            $sqlTarefasFinalizadas = "SELECT COUNT(*) AS totalFinalizadas FROM tarefasg WHERE codgrupo = ? AND estado = 'terminada'";
+            $stmtTarefasFinalizadas = $mysqli->prepare($sqlTarefasFinalizadas);
+            $stmtTarefasFinalizadas->bind_param('i', $groupId);
+            $stmtTarefasFinalizadas->execute();
+            $resultTarefasFinalizadas = $stmtTarefasFinalizadas->get_result();
+            $rowTarefasFinalizadas = $resultTarefasFinalizadas->fetch_assoc();
             $totalTarefasFinalizadas = $rowTarefasFinalizadas['totalFinalizadas'];
+
+            // Consulta SQL para contar o número de eventos criados
+            $sqlEventosCriados = "SELECT COUNT(*) AS totalCriados FROM eventos WHERE codgrupo = ?";
+            $stmtEventosCriados = $mysqli->prepare($sqlEventosCriados);
+            $stmtEventosCriados->bind_param('i', $groupId);
+            $stmtEventosCriados->execute();
+            $resultEventosCriados = $stmtEventosCriados->get_result();
+            $rowEventosCriados = $resultEventosCriados->fetch_assoc();
+            $totalEventosCriados = $rowEventosCriados['totalCriados'];
+
+            // Consulta SQL para contar o número de eventos finalizados
+            $sqlEventosFinalizados = "SELECT COUNT(*) AS totalFinalizados FROM eventos WHERE codgrupo = ? AND fim < NOW()";
+            $stmtEventosFinalizados = $mysqli->prepare($sqlEventosFinalizados);
+            $stmtEventosFinalizados->bind_param('i', $groupId);
+            $stmtEventosFinalizados->execute();
+            $resultEventosFinalizados = $stmtEventosFinalizados->get_result();
+            $rowEventosFinalizados = $resultEventosFinalizados->fetch_assoc();
+            $totalEventosFinalizados = $rowEventosFinalizados['totalFinalizados'];
             ?>
+
+
 
             <aside class="right-section">
                 <div class="top">
@@ -1083,7 +1068,7 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                         </div>
                         <div class="bottom">
                             <div class="line"></div>
-                            <h3>250</h3>
+                            <h3><?php echo $totalEventosCriados; ?></h3>
                         </div>
                     </div>
                     <div class="item">
@@ -1103,7 +1088,7 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                         </div>
                         <div class="bottom">
                             <div class="line"></div>
-                            <h3>250</h3>
+                            <h3><?php echo $totalEventosFinalizados; ?></h3>
                         </div>
                     </div>
                 </div>

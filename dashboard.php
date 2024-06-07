@@ -414,6 +414,7 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                 <script>
                     $(document).ready(function() {
                         var userId = <?php echo $idutilizador; ?>;
+                        var autoScroll = true;
 
                         function loadMessages() {
                             var user = userId;
@@ -425,7 +426,9 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                                 },
                                 success: function(data) {
                                     $('#chat-box').html(data);
-                                    $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+                                    if (autoScroll) {
+                                        $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+                                    }
                                 }
                             });
                         }
@@ -452,6 +455,17 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                         $('#message').on('keypress', function(event) {
                             if (event.which === 13) {
                                 $('#send').click();
+                            }
+                        });
+
+                        $('#chat-box').on('scroll', function() {
+                            // Verifica se o usuário está rolando para cima
+                            if ($('#chat-box').scrollTop() <= 0) {
+                                autoScroll = false;
+                            } else if ($('#chat-box').scrollTop() + $('#chat-box').innerHeight() >= $('#chat-box')[0].scrollHeight - 10) {
+                                autoScroll = true;
+                            } else {
+                                autoScroll = false;
                             }
                         });
 

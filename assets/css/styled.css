@@ -1487,46 +1487,39 @@ button.danger:hover {
 
 .message {
     display: flex;
-    align-items: flex-end;
+    flex-direction: column;
+    align-items: flex-start;
     margin-bottom: 15px;
 }
 
 .message.user {
-    flex-direction: row-reverse;
+    align-items: flex-end;
     text-align: right;
 }
 
-.message.user .avatar {
-    margin-left: 10px;
-    margin-right: 0;
+.message .username {
+    font-weight: bold;
+    margin-bottom: 5px;
 }
 
-.message.user .content {
-    background-color: #5e3bee;
-    color: white;
-}
-
-.message.other .content {
-    background-color: #e0e0e0;
-    color: black;
-}
-
-.message .avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-size: cover;
-    background-position: center;
-    margin-right: 10px;
+.message.user .username {
+    align-self: flex-end;
 }
 
 .message .content {
     padding: 10px;
     border-radius: 10px;
     max-width: calc(100% - 60px);
+    background-color: #e0e0e0;
+    color: black;
     position: relative;
     display: flex;
     flex-direction: column;
+}
+
+.message.user .content {
+    background-color: #5e3bee;
+    color: white;
 }
 
 .message .content p {

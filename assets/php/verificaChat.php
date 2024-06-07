@@ -30,16 +30,22 @@ function buscarGrupoEMembros($userId) {
     }
 }
 
-function buscarFotoUsuario($userId) {
+function buscarNomeUsuario($userId) {
     global $mysqli;
-    $query = "SELECT fotoPath FROM utilizadores WHERE idutilizador = ?";
+    $query = "SELECT primeironome, ultimonome FROM utilizadores WHERE idutilizador = ?";
     $stmt = $mysqli->prepare($query);
+
+    if (!$stmt) {
+        die('Erro na consulta SQL: ' . $mysqli->error);
+    }
+
     $stmt->bind_param('i', $userId);
     $stmt->execute();
-    $stmt->bind_result($fotoPath);
+    $stmt->bind_result($primeiroNome, $ultimoNome);
     $stmt->fetch();
     $stmt->close();
-    return $fotoPath;
+
+    return $primeiroNome . ' ' . $ultimoNome;
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'send') {
@@ -82,17 +88,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 
                 $message = decryptMessage($row['conteudo']);
                 
-                $fotoUsuario = buscarFotoUsuario($user);
-                $avatar = $fotoUsuario ? "$fotoUsuario" : "../../images/profile.png";
+                $nomeUsuario = buscarNomeUsuario($user);
 
-                echo "<div class='message$isCurrentUser'    >";
-                echo "<img class='avatar' src='$avatar' alt='Avatar do usuário'>";
+                echo "<div class='message$isCurrentUser'>";
+                echo "<div class='username'>$nomeUsuario</div>";
                 echo "<div class='content'>";
                 echo "<p>$message</p>";
                 echo "<div class='timestamp'>$timestamp</div>";
                 echo "</div>";
                 echo "</div>";
-                
             }
         } else {
             echo "Nenhuma mensagem.";

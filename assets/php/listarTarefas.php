@@ -6,7 +6,7 @@ function buscarTarefas($codgrupo) {
     global $mysqli;
     $query = "SELECT idtarefa, titulo, descricao, datahora, estado FROM tarefasg WHERE codgrupo = ?";
     $stmt = mysqli_prepare($mysqli, $query);
-    mysqli_stmt_bind_param($stmt, 'i', $codgrupo);
+    mysqli_stmt_bind_param($stmt, 's', $codgrupo);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 

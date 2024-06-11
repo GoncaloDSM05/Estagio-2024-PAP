@@ -2,7 +2,8 @@
 include 'conecta.php';
 session_start();
 
-function buscarGrupoEMembros($userId) {
+function buscarGrupoEMembros($userId)
+{
     global $mysqli;
     $query = "SELECT codgrupo FROM utilizadorgrupo WHERE idutilizador = ?";
     $stmt = $mysqli->prepare($query);
@@ -14,7 +15,7 @@ function buscarGrupoEMembros($userId) {
         $groupId = $groupResult['codgrupo'];
         $query = "SELECT g.*, u.primeironome AS donoPrimeiroNome, u.ultimonome AS donoUltimoNome FROM grupos g INNER JOIN utilizadores u ON g.idutilizadorDono = u.idutilizador WHERE g.codgrupo = ?";
         $stmt = $mysqli->prepare($query);
-        $stmt->bind_param('i', $groupId);
+        $stmt->bind_param('s', $groupId); 
         $stmt->execute();
         $groupResult = $stmt->get_result();
         $group = $groupResult->fetch_assoc();
@@ -22,7 +23,7 @@ function buscarGrupoEMembros($userId) {
 
         $query = "SELECT u.idutilizador, u.primeironome, u.ultimonome, u.nomeutilizador, u.email, u.fotoPath, u.nomefuncao FROM utilizadores u JOIN utilizadorgrupo ug ON u.idutilizador = ug.idutilizador WHERE ug.codgrupo = ?";
         $stmt = $mysqli->prepare($query);
-        $stmt->bind_param('i', $groupId);
+        $stmt->bind_param('s', $groupId); 
         $stmt->execute();
         $membersResult = $stmt->get_result();
         $members = $membersResult->fetch_all(MYSQLI_ASSOC);
@@ -31,9 +32,11 @@ function buscarGrupoEMembros($userId) {
     } else {
         return null;
     }
+
 }
 
-function atualizarGrupo($userId, $groupName, $groupGuidelines, $groupDescription) {
+function atualizarGrupo($userId, $groupName, $groupGuidelines, $groupDescription)
+{
     global $mysqli;
     $query = "SELECT idutilizadorDono FROM grupos WHERE codgrupo = (SELECT codgrupo FROM utilizadorgrupo WHERE idutilizador = ?)";
     $stmt = $mysqli->prepare($query);
@@ -61,7 +64,8 @@ function atualizarGrupo($userId, $groupName, $groupGuidelines, $groupDescription
     }
 }
 
-function verificarPalavraPasse($userId, $password) {
+function verificarPalavraPasse($userId, $password)
+{
     global $mysqli;
     $query = "SELECT palavrapasse FROM utilizadores WHERE idutilizador = ?";
     $stmt = $mysqli->prepare($query);
@@ -73,7 +77,8 @@ function verificarPalavraPasse($userId, $password) {
     return password_verify($password, $user['palavrapasse']);
 }
 
-function removerMembro($adminId, $userId, $password) {
+function removerMembro($adminId, $userId, $password)
+{
     global $mysqli;
 
     if ($adminId === $userId) {
@@ -111,7 +116,8 @@ function removerMembro($adminId, $userId, $password) {
     }
 }
 
-function transferirAdmin($adminId, $userId, $password) {
+function transferirAdmin($adminId, $userId, $password)
+{
     global $mysqli;
 
     if ($adminId === $userId) {
@@ -149,7 +155,8 @@ function transferirAdmin($adminId, $userId, $password) {
     }
 }
 
-function exitMember($userId) {
+function exitMember($userId)
+{
     global $mysqli;
     $queryCheckOwner = "SELECT codgrupo FROM grupos WHERE idutilizadorDono = ?";
     $stmtCheckOwner = $mysqli->prepare($queryCheckOwner);

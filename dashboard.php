@@ -230,7 +230,7 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
             // Obter informações do grupo
             $query = "SELECT g.*, u.primeironome AS donoPrimeiroNome, u.ultimonome AS donoUltimoNome FROM grupos g INNER JOIN utilizadores u ON g.idutilizadorDono = u.idutilizador WHERE g.codgrupo = ?";
             $stmt = mysqli_prepare($mysqli, $query);
-            mysqli_stmt_bind_param($stmt, 'i', $groupId);
+            mysqli_stmt_bind_param($stmt, 's', $groupId);
             mysqli_stmt_execute($stmt);
             $groupResult = mysqli_stmt_get_result($stmt);
             $group = mysqli_fetch_assoc($groupResult);
@@ -241,7 +241,7 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
             // Buscar membros do grupo
             $query = "SELECT u.idutilizador, u.primeironome, u.ultimonome, u.nomeutilizador, u.email, u.fotoPath, u.nomefuncao FROM utilizadores u JOIN utilizadorgrupo ug ON u.idutilizador = ug.idutilizador WHERE ug.codgrupo = ?";
             $stmt = mysqli_prepare($mysqli, $query);
-            mysqli_stmt_bind_param($stmt, 'i', $groupId);
+            mysqli_stmt_bind_param($stmt, 's', $groupId);
             mysqli_stmt_execute($stmt);
             $membersResult = mysqli_stmt_get_result($stmt);
             $members = mysqli_fetch_all($membersResult, MYSQLI_ASSOC);
@@ -345,7 +345,7 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                     // Consulta SQL para contar o número de tarefas e eventos do grupo
                     $sqlAtividades = "SELECT tipo, COUNT(*) AS total FROM (SELECT 'Tarefa' AS tipo FROM tarefasg WHERE codgrupo = ? UNION ALL SELECT 'Evento' AS tipo FROM eventos WHERE codgrupo = ?) AS atividades GROUP BY tipo";
                     $stmtAtividades = $mysqli->prepare($sqlAtividades);
-                    $stmtAtividades->bind_param('ii', $groupId, $groupId);
+                    $stmtAtividades->bind_param('ss', $groupId, $groupId);
                     $stmtAtividades->execute();
                     $resultAtividades = $stmtAtividades->get_result();
                     ?>
@@ -395,8 +395,6 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                     </script>
                 </main>
             </div>
-
-
 
             <div id="chat" class="content">
                 <div id="chat-container">
@@ -459,7 +457,6 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                         });
 
                         $('#chat-box').on('scroll', function() {
-                            // Verifica se o usuário está rolando para cima
                             if ($('#chat-box').scrollTop() <= 0) {
                                 autoScroll = false;
                             } else if ($('#chat-box').scrollTop() + $('#chat-box').innerHeight() >= $('#chat-box')[0].scrollHeight - 10) {
@@ -471,10 +468,15 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
 
                         setInterval(loadMessages, 1000);
                         loadMessages();
+
+                        $('#video-call').click(function() {
+                            var groupCode = '<?php echo $groupId ?>'; // Substitua 'SEUCODIGO' pelo código do grupo
+                            window.open('videochamada.html?group=' + groupCode, '_blank');
+                        });
+
                     });
                 </script>
             </div>
-
 
             <div id="tasks" class="content">
                 <h1>Gerenciador de Tarefas</h1>
@@ -1012,7 +1014,7 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
             // Consulta SQL para contar o número de tarefas criadas
             $sqlTarefasCriadas = "SELECT COUNT(*) AS totalCriadas FROM tarefasg WHERE codgrupo = ?";
             $stmtTarefasCriadas = $mysqli->prepare($sqlTarefasCriadas);
-            $stmtTarefasCriadas->bind_param('i', $groupId);
+            $stmtTarefasCriadas->bind_param('s', $groupId);
             $stmtTarefasCriadas->execute();
             $resultTarefasCriadas = $stmtTarefasCriadas->get_result();
             $rowTarefasCriadas = $resultTarefasCriadas->fetch_assoc();
@@ -1021,7 +1023,7 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
             // Consulta SQL para contar o número de tarefas finalizadas
             $sqlTarefasFinalizadas = "SELECT COUNT(*) AS totalFinalizadas FROM tarefasg WHERE codgrupo = ? AND estado = 'terminada'";
             $stmtTarefasFinalizadas = $mysqli->prepare($sqlTarefasFinalizadas);
-            $stmtTarefasFinalizadas->bind_param('i', $groupId);
+            $stmtTarefasFinalizadas->bind_param('s', $groupId);
             $stmtTarefasFinalizadas->execute();
             $resultTarefasFinalizadas = $stmtTarefasFinalizadas->get_result();
             $rowTarefasFinalizadas = $resultTarefasFinalizadas->fetch_assoc();
@@ -1030,7 +1032,7 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
             // Consulta SQL para contar o número de eventos criados
             $sqlEventosCriados = "SELECT COUNT(*) AS totalCriados FROM eventos WHERE codgrupo = ?";
             $stmtEventosCriados = $mysqli->prepare($sqlEventosCriados);
-            $stmtEventosCriados->bind_param('i', $groupId);
+            $stmtEventosCriados->bind_param('s', $groupId);
             $stmtEventosCriados->execute();
             $resultEventosCriados = $stmtEventosCriados->get_result();
             $rowEventosCriados = $resultEventosCriados->fetch_assoc();
@@ -1039,7 +1041,7 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
             // Consulta SQL para contar o número de eventos finalizados
             $sqlEventosFinalizados = "SELECT COUNT(*) AS totalFinalizados FROM eventos WHERE codgrupo = ? AND fim < NOW()";
             $stmtEventosFinalizados = $mysqli->prepare($sqlEventosFinalizados);
-            $stmtEventosFinalizados->bind_param('i', $groupId);
+            $stmtEventosFinalizados->bind_param('s', $groupId);
             $stmtEventosFinalizados->execute();
             $resultEventosFinalizados = $stmtEventosFinalizados->get_result();
             $rowEventosFinalizados = $resultEventosFinalizados->fetch_assoc();

@@ -51,7 +51,7 @@ function buscarNomeUsuario($userId) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'send') {
     $userId = intval($_POST['user']);
     $message = $_POST['message'];
-    $groupCode = buscarGrupoEMembros($userId);
+    $groupCode = buscarGrupoEMembros($userId); // Obtém o código do grupo do usuário
 
     if ($groupCode !== null) {
         $encryptedMessage = encryptMessage($message);
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     }
 } else {
     $userId = intval($_GET['user']);
-    $groupCode = buscarGrupoEMembros($userId);
+    $groupCode = buscarGrupoEMembros($userId); // Obtém o código do grupo do usuário
 
     if ($groupCode !== null) {
         $sql = "SELECT * FROM chats WHERE codgrupo = ? ORDER BY datahora";
@@ -90,13 +90,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
                 
                 $nomeUsuario = buscarNomeUsuario($user);
 
-                echo "<div class='message$isCurrentUser'>";
-                echo "<div class='username'>$nomeUsuario</div>";
-                echo "<div class='content'>";
-                echo "<p>$message</p>";
-                echo "<div class='timestamp'>$timestamp</div>";
-                echo "</div>";
-                echo "</div>";
+                if ($row['codgrupo'] == $groupCode){
+                    echo "<div class='message$isCurrentUser'>";
+                    echo "<div class='username'>$nomeUsuario</div>";
+                    echo "<div class='content'>";
+                    echo "<p>$message</p>";
+                    echo "<div class='timestamp'>$timestamp</div>";
+                    echo "</div>";
+                    echo "</div>";
+                }
             }
         } else {
             echo "Nenhuma mensagem.";

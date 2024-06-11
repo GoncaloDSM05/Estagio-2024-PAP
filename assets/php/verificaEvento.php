@@ -52,7 +52,7 @@ if ($action == 'addEvent' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($codgrupo != null) {
         $query = $mysqli->prepare("SELECT idevento, titulo, cor, inicio, fim FROM eventos WHERE codgrupo = ?");
-        $query->bind_param('i', $codgrupo);
+        $query->bind_param('s', $codgrupo);
         $query->execute();
         $result = $query->get_result();
 

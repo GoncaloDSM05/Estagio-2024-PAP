@@ -360,7 +360,7 @@ if ($result->num_rows > 0) {
                 if (reason === 'erroImagem') {
                     showNotification('Ocorreu um erro ao alterar a foto de perfil, tente novamente mais tarde.', 'error');
                 } else if (reason === 'passwordErrada') {
-                    showNotification('A password atual introduzida está errada, tente novamente.', 'error');
+                    showNotification('A palavra-passe atual introduzida está errada, tente novamente.', 'error');
                 } else if (reason === 'passwordDiferentes') {
                     showNotification('As palavras-passes não são iguais, volte a introduzi-las.', 'error');
                 } else if (reason === "erroPassword") {

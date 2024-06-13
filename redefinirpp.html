@@ -15,8 +15,14 @@
         <div class="form-container sign-in">
             <form method="post" action="assets/php/redefinirPP.php">
                 <h1>Definição da nova Palavra-Passe</h1>
-                <input type="password" name="pp1" placeholder="Palavra-Passe" required>
-                <input type="password" name="pp2" placeholder="Confirmar Palavra-Passe" required>
+                <input type="password" name="pp1" id="pp1" placeholder="Palavra-Passe" required>
+                <button type="button" onclick="togglePasswordVisibility('pp1', 'toggleIcon1')" class="password-toggle">
+                    <i id="toggleIcon1" class="fas fa-eye"></i>
+                </button>
+                <input type="password" name="pp2" id="pp2" placeholder="Confirmar Palavra-Passe" required>
+                <button type="button" onclick="togglePasswordVisibility('pp2', 'toggleIcon2')" class="password-toggle">
+                    <i id="toggleIcon2" class="fas fa-eye"></i>
+                </button>
                 <input type="hidden" name="token" id="tokenF">
                 <button>Atualizar</button>
             </form>
@@ -35,8 +41,6 @@
     <div id="notification" class="notification"></div>
 
     <script>
-
-
         function getQueryParam(param) {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(param);
@@ -80,17 +84,20 @@
             }, 5000);
         }
 
-        // Função para remover os parâmetros da URL
+        // Função para remover os parâmetros da URL, exceto o token
         function removeQueryParams() {
             const url = new URL(window.location);
+            const token = url.searchParams.get('token');
             url.searchParams.delete('notification');
             url.searchParams.delete('reason');
+            if (token) {
+                url.searchParams.set('token', token); // Preserve only the token param
+            }
             window.history.replaceState({}, document.title, url);
         }
 
         // Executar na carga da página
         window.onload = () => {
-
             // Extrai o token da URL
             const token = getQueryParam('token');
 
@@ -114,9 +121,25 @@
             }
 
             removeQueryParams();
-
         };
     </script>
+
+    <script>
+        function togglePasswordVisibility(passwordInputId, toggleIconId) {
+            var passwordInput = document.getElementById(passwordInputId);
+            var toggleIcon = document.getElementById(toggleIconId);
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = "password";
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
+
 </body>
 
 </html>

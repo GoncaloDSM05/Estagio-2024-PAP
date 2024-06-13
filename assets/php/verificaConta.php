@@ -34,7 +34,6 @@ function nomeUtilizadorExiste($mysqli, $nutilizador) {
 }
 
 function verificarDados($mysqli, $identificador, $palavrapasse) {
-    // A consulta verifica se o identificador corresponde a um email ou a um nome de utilizador na mesma coluna
     $stmt = $mysqli->prepare("SELECT idutilizador, palavrapasse FROM utilizadores WHERE email = ? OR nomeutilizador = ?");
     if ($stmt === false) {
         return false;
@@ -52,7 +51,6 @@ function verificarDados($mysqli, $identificador, $palavrapasse) {
     return false;
 }
 
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (isset($_POST['action']) && $_POST['action'] == "register") {
@@ -64,6 +62,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $nfuncao = test_input($_POST['nfuncao']);
             $email = test_input($_POST['email']);
             $palavrapasse = password_hash($_POST['palavrapasse'], PASSWORD_DEFAULT);
+
+            // Verifica se algum campo está vazio
+            if (empty($pnome) || empty($unome) || empty($nutilizador) || empty($nfuncao) || empty($email) || empty($_POST['palavrapasse'])) {
+                header("Location: ../../conta.html?notification=error&reason=empty_fields");
+                exit;
+            }
 
             if (emailExiste($mysqli, $email)) {
                 header("Location: ../../conta.html?notification=error&reason=email_exists");
@@ -100,6 +104,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (isset($_POST['emailnomeutilizador'], $_POST['palavrapasse'])) {
             $emailnomeutilizador = test_input($_POST['emailnomeutilizador']);
             $palavrapasse = $_POST['palavrapasse'];
+
+            if (empty($emailnomeutilizador) || empty($palavrapasse)) {
+                header("Location: ../../conta.html?notification=error&reason=empty_fields");
+                exit;
+            }
 
             $idutilizador = verificarDados($mysqli, $emailnomeutilizador, $palavrapasse);
             if ($idutilizador !== false) {

@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Verifica se as pps são iguais
         if ($pp1 != $pp2) {
             // As pps não coincidem
-            header("Location: ../../redefinirpp.html?notification=" . NOTIFICATION_ERROR . "&reason=" . REASON_PASSWORD_MISMATCH);
+            header("Location: ../../redefinirpp.html?token=" . urlencode($token) . "&notification=" . NOTIFICATION_ERROR . "&reason=" . REASON_PASSWORD_MISMATCH);
             exit;
         }
 
@@ -54,14 +54,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmt_delete->execute();
 
                 header("Location: ../../conta.html?notification=" . NOTIFICATION_SUCCESS . "&reason=" . REASON_UPDATE_SUCCESS);
-                
+                exit;
             } else {
                 // Erro ao atualizar a pp
-                header("Location: ../../redefinirpp.html?notification=" . NOTIFICATION_ERROR . "&reason=" . REASON_UPDATE_FAILED);
+                header("Location: ../../redefinirpp.html?token=" . urlencode($token) . "&notification=" . NOTIFICATION_ERROR . "&reason=" . REASON_UPDATE_FAILED);
+                exit;
             }
         } else {
             // Token inválido ou expirado
-            header("Location: ../../redefinirpp.html?notification=" . NOTIFICATION_ERROR . "&reason=" . REASON_TOKEN_EXPIRED_OR_INVALID);
+            header("Location: ../../redefinirpp.html?token=" . urlencode($token) . "&notification=" . NOTIFICATION_ERROR . "&reason=" . REASON_TOKEN_EXPIRED_OR_INVALID);
+            exit;
         }
     } else {
         // Parâmetros ausentes

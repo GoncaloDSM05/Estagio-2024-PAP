@@ -122,9 +122,9 @@
             const reason = getQueryParam('reason');
 
             if (notification === 'success') {
-                if (reason === 'update_sucess') {
+                if (reason === 'update_success') {
                     showNotification('Palavra-Passe redefinida com sucesso!', 'success');
-                } else {
+                } else if (reason === 'registered') {
                     showNotification('Utilizador registado com sucesso!', 'success');
                 }
             } else if (notification === 'error') {
@@ -134,6 +134,8 @@
                     showNotification('O Nome de utilizador introduzido já está registado.', 'error');
                 } else if (reason === 'loginfailed') {
                     showNotification('Entrada negada! Por favor introduza os dados corretamente.', 'error');
+                } else if (reason === 'empty_fields') {
+                    showNotification('Por favor introduza os dados corretamente.', 'error');
                 }
             }
 

@@ -2,6 +2,18 @@
 session_start(); // Inicia a sessão
 require 'conecta.php'; // Inclui o arquivo de conexão
 
+// Função para adicionar uma notificação
+function adicionarNotificacao($tipo_notificacao, $mensagem, $idutilizador) {
+    global $mysqli;
+
+    $data = date('Y-m-d H:i:s');
+
+    $stmt = $mysqli->prepare("INSERT INTO notificacoes (tipo_notificacao, mensagem, idutilizador, data) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssis", $tipo_notificacao, $mensagem, $idutilizador, $data);
+    $stmt->execute();
+    $stmt->close();
+}
+
 if (!isset($_GET['codgrupo'])) {
     die('Código do grupo não especificado.');
 }
@@ -25,6 +37,20 @@ if ($stmt->num_rows == 1) {
     $stmt2->bind_param("is", $idUtilizador, $codigoGrupo);
     if ($stmt2->execute()) {
         $_SESSION['codgrupo'] = $codigoGrupo;
+
+        // Adicionar notificação de membro entrando no grupo para o dono do grupo
+        $groupOwnerStmt = $mysqli->prepare("SELECT idutilizadordono FROM grupos WHERE codgrupo = ?");
+        $groupOwnerStmt->bind_param("s", $codigoGrupo);
+        $groupOwnerStmt->execute();
+        $groupOwnerStmt->bind_result($groupOwnerId);
+        $groupOwnerStmt->fetch();
+        $groupOwnerStmt->close();
+
+        if ($groupOwnerId != $idUtilizador) {
+            $groupOwnerNotificationMessage = "Um novo membro entrou no grupo.";
+            adicionarNotificacao("Membro Entrou no Grupo", $groupOwnerNotificationMessage, $groupOwnerId);
+        }
+
         header("Location: ../../dashboard.php?notification=success&reason=entrouGrupo");
         exit;
     } else {
@@ -39,5 +65,4 @@ if ($stmt->num_rows == 1) {
 
 $stmt->close();
 $mysqli->close();
-
 ?>

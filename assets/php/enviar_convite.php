@@ -16,7 +16,7 @@ function buscarGrupo($groupId) {
         exit;
     }
 
-    $stmt->bind_param("i", $groupId);
+    $stmt->bind_param("s", $groupId);
     $stmt->execute();
     $resultado = $stmt->get_result();
 
@@ -140,6 +140,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // Enviar o email
                 $mail->send();
                 
+                // Adicionar notificação no banco de dados
+                $tipo_notificacao = "Convite para Grupo";
+                $mensagem = "Você recebeu um convite para ingressar no grupo " . $groupInfo['nome'] . ".";
+                $idutilizador = $user['idutilizador'];
+                $data = date('Y-m-d H:i:s');
+
+                $stmt = $mysqli->prepare("INSERT INTO notificacoes (tipo_notificacao, mensagem, idutilizador, data) VALUES (?, ?, ?, ?)");
+                $stmt->bind_param("ssis", $tipo_notificacao, $mensagem, $idutilizador, $data);
+                $stmt->execute();
+                $stmt->close();
+
                 // Redirecionar após o envio bem-sucedido
                 header("Location: ../../dashboard.php?notification=success&reason=conviteEnviado");
                 exit;

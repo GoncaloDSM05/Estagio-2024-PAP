@@ -96,7 +96,12 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
             </main>
             <aside class="right-section">
                 <div class="top">
-                    <i class='bx bx-bell'></i>
+                    <div class="notification-container">
+                        <i class='bx bx-bell' id="notification-icon"></i>
+                        <div class="notification-dropdown" id="notification-dropdown">
+                            <!-- Aqui vão as notificações -->
+                        </div>
+                    </div>
                     <div class="profile">
                         <div class="left">
                             <img src="<?php echo htmlspecialchars($user['fotoPath']) ? 'assets/php/' . $user['fotoPath'] . '?' . time() : 'images/profile.png'; ?>" alt="Foto de perfil" class="profile-photo">
@@ -109,6 +114,84 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
 
                 </div>
             </aside>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    fetchNotifications(); // Verifica e atualiza as notificações quando a página carrega
+                });
+
+                document.getElementById("notification-icon").addEventListener("click", function() {
+                    const notificationDropdown = document.getElementById("notification-dropdown");
+                    notificationDropdown.classList.toggle("active");
+
+                    // Marcar notificações como lidas quando o dropdown for aberto
+                    if (notificationDropdown.classList.contains("active")) {
+                        markNotificationsAsRead();
+                    }
+                });
+
+                // Função para recuperar e exibir notificações
+                function fetchNotifications() {
+                    fetch('assets/php/verificaNotificacoes.php')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const notifications = data.notifications;
+                                const notificationDropdown = document.getElementById('notification-dropdown');
+                                notificationDropdown.innerHTML = ''; // Limpa as notificações anteriores
+                                notifications.forEach(notification => {
+                                    const notificationItem = document.createElement('div');
+                                    notificationItem.classList.add('notification-item');
+                                    notificationItem.innerHTML = `
+                        <p>${notification.mensagem}</p>
+                        <span>${notification.created_at}</span>
+                    `;
+                                    notificationDropdown.appendChild(notificationItem);
+                                });
+
+                                // Verificar se há notificações não lidas
+                                const notificationIcon = document.getElementById('notification-icon');
+                                if (data.unreadCount > 0) {
+                                    notificationIcon.classList.add('has-unread');
+                                } else {
+                                    notificationIcon.classList.remove('has-unread');
+                                }
+                            } else {
+                                console.error('Erro ao recuperar notificações:', data.error);
+                            }
+                        })
+                        .catch(error => console.error('Erro ao processar resposta:', error));
+                }
+
+                // Marcar notificações como lidas
+                function markNotificationsAsRead() {
+                    fetch('assets/php/marcarNotificacoesLidas.php')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const notificationIcon = document.getElementById('notification-icon');
+                                notificationIcon.classList.remove('has-unread');
+                            } else {
+                                console.error('Erro ao marcar notificações como lidas:', data.error);
+                            }
+                        })
+                        .catch(error => console.error('Erro ao processar resposta:', error));
+                }
+
+                // Fecha a caixa de notificações quando clicar fora dela
+                window.onclick = function(event) {
+                    if (!event.target.matches('#notification-icon')) {
+                        const dropdowns = document.getElementsByClassName("notification-dropdown");
+                        for (let i = 0; i < dropdowns.length; i++) {
+                            const openDropdown = dropdowns[i];
+                            if (openDropdown.classList.contains('active')) {
+                                openDropdown.classList.remove('active');
+                            }
+                        }
+                    }
+                };
+            </script>
+
             <script>
                 document.addEventListener("DOMContentLoaded", function() {
                     var modalCriar = document.getElementById("modalCriarGrupo");
@@ -269,6 +352,7 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
         // Defina o groupId como vazio ou algum valor padrão, dependendo do caso
         $groupId = '';
     }
+
     ?>
 
     <!DOCTYPE html>
@@ -403,7 +487,6 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                         <div id="input-container">
                             <input type="text" id="message" placeholder="Digite a sua mensagem">
                             <button id="send" data-tooltip="Enviar mensagem"><i class="fas fa-paper-plane icon"></i></button>
-                            <button id="video-call" data-tooltip="Começar videochamada"><i class="fas fa-video icon"></i></button>
                         </div>
                     </div>
                 </div>
@@ -468,12 +551,6 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
 
                         setInterval(loadMessages, 1000);
                         loadMessages();
-
-                        $('#video-call').click(function() {
-                            var groupCode = '<?php echo $groupId ?>'; // Substitua 'SEUCODIGO' pelo código do grupo
-                            window.open('videochamada.html?group=' + groupCode, '_blank');
-                        });
-
                     });
                 </script>
             </div>
@@ -1052,7 +1129,12 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
 
             <aside class="right-section">
                 <div class="top">
-                    <i class='bx bx-bell'></i>
+                    <div class="notification-container">
+                        <i class='bx bx-bell' id="notification-icon"></i>
+                        <div class="notification-dropdown" id="notification-dropdown">
+                            <!-- Aqui vão as notificações -->
+                        </div>
+                    </div>
                     <div class="profile">
                         <div class="left">
                             <img src="<?php echo htmlspecialchars($user['fotoPath']) ? 'assets/php/' . $user['fotoPath'] . '?' . time() : 'images/profile.png'; ?>" alt="Foto de perfil" class="profile-photo">
@@ -1112,6 +1194,83 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
             </aside>
 
         </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                fetchNotifications(); // Verifica e atualiza as notificações quando a página carrega
+            });
+
+            document.getElementById("notification-icon").addEventListener("click", function() {
+                const notificationDropdown = document.getElementById("notification-dropdown");
+                notificationDropdown.classList.toggle("active");
+
+                // Marcar notificações como lidas quando o dropdown for aberto
+                if (notificationDropdown.classList.contains("active")) {
+                    markNotificationsAsRead();
+                }
+            });
+
+            // Função para recuperar e exibir notificações
+            function fetchNotifications() {
+                fetch('assets/php/verificaNotificacoes.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const notifications = data.notifications;
+                            const notificationDropdown = document.getElementById('notification-dropdown');
+                            notificationDropdown.innerHTML = ''; // Limpa as notificações anteriores
+                            notifications.forEach(notification => {
+                                const notificationItem = document.createElement('div');
+                                notificationItem.classList.add('notification-item');
+                                notificationItem.innerHTML = `
+                        <p>${notification.mensagem}</p>
+                        <span>${notification.created_at}</span>
+                    `;
+                                notificationDropdown.appendChild(notificationItem);
+                            });
+
+                            // Verificar se há notificações não lidas
+                            const notificationIcon = document.getElementById('notification-icon');
+                            if (data.unreadCount > 0) {
+                                notificationIcon.classList.add('has-unread');
+                            } else {
+                                notificationIcon.classList.remove('has-unread');
+                            }
+                        } else {
+                            console.error('Erro ao recuperar notificações:', data.error);
+                        }
+                    })
+                    .catch(error => console.error('Erro ao processar resposta:', error));
+            }
+
+            // Marcar notificações como lidas
+            function markNotificationsAsRead() {
+                fetch('assets/php/marcarNotificacoesLidas.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const notificationIcon = document.getElementById('notification-icon');
+                            notificationIcon.classList.remove('has-unread');
+                        } else {
+                            console.error('Erro ao marcar notificações como lidas:', data.error);
+                        }
+                    })
+                    .catch(error => console.error('Erro ao processar resposta:', error));
+            }
+
+            // Fecha a caixa de notificações quando clicar fora dela
+            window.onclick = function(event) {
+                if (!event.target.matches('#notification-icon')) {
+                    const dropdowns = document.getElementsByClassName("notification-dropdown");
+                    for (let i = 0; i < dropdowns.length; i++) {
+                        const openDropdown = dropdowns[i];
+                        if (openDropdown.classList.contains('active')) {
+                            openDropdown.classList.remove('active');
+                        }
+                    }
+                }
+            };
+        </script>
 
         <script>
             var calendarInitialized = false;

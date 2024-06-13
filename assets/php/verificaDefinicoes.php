@@ -2,6 +2,17 @@
 include 'conecta.php';
 session_start();
 
+function adicionarNotificacao($tipo_notificacao, $mensagem, $idutilizador) {
+    global $mysqli;
+
+    $data = date('Y-m-d H:i:s');
+
+    $stmt = $mysqli->prepare("INSERT INTO notificacoes (tipo_notificacao, mensagem, idutilizador, data) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssis", $tipo_notificacao, $mensagem, $idutilizador, $data);
+    $stmt->execute();
+    $stmt->close();
+}
+
 function buscarGrupoEMembros($userId)
 {
     global $mysqli;
@@ -108,6 +119,10 @@ function removerMembro($adminId, $userId, $password)
     $stmt = $mysqli->prepare($query);
     $stmt->bind_param('ii', $userId, $adminId);
     if ($stmt->execute()) {
+        // Adicionar notificação de expulsão do grupo para o usuário removido
+        $expulsionNotificationMessage = "Você foi removido do grupo.";
+        adicionarNotificacao("Expulsão do Grupo", $expulsionNotificationMessage, $userId);
+        
         header("Location: ../../dashboard.php?notification=success&reason=membroRemovido");
         exit;
     } else {
@@ -147,6 +162,10 @@ function transferirAdmin($adminId, $userId, $password)
     $stmt = $mysqli->prepare($query);
     $stmt->bind_param('iii', $userId, $adminId, $adminId);
     if ($stmt->execute()) {
+        // Adicionar notificação de transferência de admin para o novo administrador
+        $transferNotificationMessage = "Você foi promovido a administrador do grupo.";
+        adicionarNotificacao("Transferência de Admin do Grupo", $transferNotificationMessage, $userId);
+        
         header("Location: ../../dashboard.php?notification=success&reason=transferiuAdmin");
         exit;
     } else {
@@ -154,6 +173,7 @@ function transferirAdmin($adminId, $userId, $password)
         exit;
     }
 }
+
 
 function exitMember($userId)
 {

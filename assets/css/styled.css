@@ -1,5 +1,85 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
 
+/* Estilos para a página de dashboard */
+
+/* Estilos específicos para secções de Tarefas e Eventos */
+.dashboard-section {
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+.section-header {
+    background-color: #5e3bee;
+    color: #fff;
+    padding: 10px;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 10px;
+}
+
+.section-header h2 {
+    font-size: 1.2em;
+    margin: 0;
+}
+
+.dashboard-list {
+    list-style: none;
+    padding: 0;
+}
+
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.list-item:last-child {
+    border-bottom: none;
+}
+
+.item-title {
+    font-weight: bold;
+}
+
+.item-status {
+    font-size: 0.8em;
+    padding: 5px 10px;
+    border-radius: 4px;
+    color: #999;
+}
+
+.empty {
+    color: #999;
+    text-align: center;
+    padding: 10px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .dashboard-section {
+        padding: 15px;
+    }
+
+    .section-header h2 {
+        font-size: 1.1em;
+    }
+}
+
+@media (max-width: 576px) {
+    .dashboard-section {
+        padding: 10px;
+    }
+
+    .section-header h2 {
+        font-size: 1em;
+    }
+}
+
 html,
 body {
     min-height: 100vh;
@@ -307,220 +387,12 @@ main .separator .info a {
     font-size: 14px;
 }
 
-main .separator .search {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-main .separator .search i {
-    font-size: 20px;
-    color: #BDBDBD;
-}
-
-main .separator .search input {
-    border: none;
-    font-size: 14px;
-    width: 80px;
-    outline: none;
-}
-
-main .separator .search input::placeholder {
-    color: #BDBDBD;
-}
-
-main .analytics {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-top: 20px;
-}
-
-main .analytics .item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 140px;
-    min-width: 214px;
-    padding: 20px;
-    border-radius: 20px;
-}
-
-main .analytics .item .progress {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-main .analytics .item .progress .info h5 {
-    color: #fff;
-    font-size: 20px;
-    font-weight: bold;
-}
-
-main .analytics .item .progress .info p {
-    color: #fff;
-    font-size: 12px;
-}
-
-main .analytics .item .progress .progress-bar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 20px;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-}
-
-main .analytics .item:nth-child(1) .progress .progress-bar {
-    background: radial-gradient(closest-side, #5e3bee 79%, transparent 80% 100%),
-        conic-gradient(#5e3bee 25%, #fff 0%);
-}
-
-main .analytics .item:nth-child(2) .progress .progress-bar {
-    background: radial-gradient(closest-side, #FF993A 79%, transparent 80% 100%),
-        conic-gradient(#FF7E07 50%, #fff 0%);
-}
-
-main .analytics .item:nth-child(3) .progress .progress-bar {
-    background: radial-gradient(closest-side, #8AC53E 79%, transparent 80% 100%),
-        conic-gradient(#6EB33D 75%, #fff 0%);
-}
-
-main .analytics .item:nth-child(4) .progress .progress-bar {
-    background: radial-gradient(closest-side, #FFD043 79%, transparent 80% 100%),
-        conic-gradient(#FFC000 25%, #fff 0%);
-}
-
-main .analytics .item .progress .progress-bar::before {
-    font-size: 10px;
-    color: #fff;
-}
-
-main .analytics .item:nth-child(1) .progress .progress-bar::before,
-main .analytics .item:nth-child(4) .progress .progress-bar::before {
-    content: "75%";
-}
-
-main .analytics .item:nth-child(2) .progress .progress-bar::before {
-    content: "50%";
-}
-
-main .analytics .item:nth-child(3) .progress .progress-bar::before {
-    content: "25%";
-}
-
-main .analytics .item i {
-    font-size: 80px;
-    color: #fff;
-}
-
-main .analytics .item:nth-child(1) {
-    background: #5e3bee;
-}
-
-main .analytics .item:nth-child(2) {
-    background: #FF993A;
-}
-
-main .analytics .item:nth-child(3) {
-    background: #8AC53E;
-}
-
-main .analytics .item:nth-child(4) {
-    background: #FFD043;
-}
-
 main .separator input {
     border: none;
     color: #5e3bee;
     font-weight: bold;
     outline: none;
     width: 100px;
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator {
-    opacity: 0.5;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-main .planning {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-main .planning .item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px;
-    background-color: #F7F7F7;
-    border-radius: 20px;
-}
-
-main .planning .item .left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-main .planning .item .left .icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-main .planning .item:nth-child(1) .left .icon {
-    background: #D1E6F9;
-}
-
-main .planning .item:nth-child(1) .left .icon i {
-    color: #5e3bee;
-}
-
-main .planning .item:nth-child(2) .left .icon {
-    background: #F9E5D2;
-}
-
-main .planning .item:nth-child(2) .left .icon i {
-    color: #FF993A;
-}
-
-main .planning .item:nth-child(3) .left .icon {
-    background: #E2EDD2;
-}
-
-main .planning .item:nth-child(3) .left .icon i {
-    color: #8AC53E;
-}
-
-main .planning .item:nth-child(4) .left .icon {
-    background: #F9F0D3;
-}
-
-main .planning .item:nth-child(4) .left .icon i {
-    color: #FFD143;
-}
-
-main .planning .item .left .details h5 {
-    font-size: 12px;
-    font-weight: 600;
-}
-
-main .planning .item .left .details p {
-    font-size: 12px;
-    color: #BDBDBD;
-}
-
-main .planning .item>i {
-    cursor: pointer;
 }
 
 .container .right-section {
@@ -1065,7 +937,7 @@ button.danger:hover {
     outline: none;
 }
 
-/* Estilos gerais para a seção de tarefas */
+/* Estilos gerais para a secção de tarefas */
 #tasks {
     margin: 20px;
     padding: 20px;
@@ -1592,10 +1464,10 @@ button.danger:hover {
 
 .notification-dropdown {
     position: absolute;
-    top: 30px; /* Ajuste conforme necessário */
+    top: 30px; 
     right: 0;
     background-color: #fff;
-    min-width: 200px; /* Ajuste conforme necessário */
+    min-width: 200px; 
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
     display: none;

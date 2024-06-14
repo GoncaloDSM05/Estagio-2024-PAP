@@ -294,7 +294,7 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
 <?php else : ?>
 
     <?php
-    include 'assets/php/conecta.php'; // Supõe que você tem um arquivo db.php com as configurações de conexão ao banco de dados
+    include 'assets/php/conecta.php';
 
     // Função para buscar informações do grupo e membros
     function buscarGrupoEMembros($userId)
@@ -318,7 +318,7 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
             $groupResult = mysqli_stmt_get_result($stmt);
             $group = mysqli_fetch_assoc($groupResult);
 
-            // Verificar se o usuário atual é o dono do grupo
+            // Verificar se o utilizador atual é o dono do grupo
             $isOwner = ($group['idutilizadorDono'] == $userId);
 
             // Buscar membros do grupo
@@ -336,7 +336,7 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
         }
     }
 
-    // Pegar o ID do usuário da sessão
+    // Pegar o ID do utilizador da sessão
     $userId = $_SESSION['idutilizador'];
 
     // Buscar informações do grupo e membros
@@ -409,6 +409,89 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                     </div>
             </aside>
 
+            <?php
+            include 'assets/php/conecta.php';
+
+            // Função para buscar informações do grupo e membros
+            function buscarGrupo($userId)
+            {
+                global $mysqli;
+
+                $query = "SELECT codgrupo FROM utilizadorgrupo WHERE idutilizador = ?";
+                $stmt = mysqli_prepare($mysqli, $query);
+                mysqli_stmt_bind_param($stmt, 'i', $userId);
+                mysqli_stmt_execute($stmt);
+                $result = mysqli_stmt_get_result($stmt);
+
+                if ($groupResult = mysqli_fetch_assoc($result)) {
+                    $groupId = $groupResult['codgrupo'];
+
+                    // Obter informações do grupo
+                    $query = "SELECT g.*, u.primeironome AS donoPrimeiroNome, u.ultimonome AS donoUltimoNome FROM grupos g INNER JOIN utilizadores u ON g.idutilizadorDono = u.idutilizador WHERE g.codgrupo = ?";
+                    $stmt = mysqli_prepare($mysqli, $query);
+                    mysqli_stmt_bind_param($stmt, 's', $groupId);
+                    mysqli_stmt_execute($stmt);
+                    $groupResult = mysqli_stmt_get_result($stmt);
+                    $group = mysqli_fetch_assoc($groupResult);
+
+                    // Verificar se o utilizador atual é o dono do grupo
+                    $isOwner = ($group['idutilizadorDono'] == $userId);
+
+                    // Buscar membros do grupo
+                    $query = "SELECT u.idutilizador, u.primeironome, u.ultimonome, u.nomeutilizador, u.email, u.fotoPath, u.nomefuncao FROM utilizadores u JOIN utilizadorgrupo ug ON u.idutilizador = ug.idutilizador WHERE ug.codgrupo = ?";
+                    $stmt = mysqli_prepare($mysqli, $query);
+                    mysqli_stmt_bind_param($stmt, 's', $groupId);
+                    mysqli_stmt_execute($stmt);
+                    $membersResult = mysqli_stmt_get_result($stmt);
+                    $members = mysqli_fetch_all($membersResult, MYSQLI_ASSOC);
+
+                    // Retorna o ID do grupo junto com outras informações
+                    return array('groupId' => $groupId, 'group' => $group, 'isOwner' => $isOwner, 'members' => $members);
+                } else {
+                    return false;
+                }
+            }
+
+            // Pegar o ID do utilizador da sessão
+            $userId = $_SESSION['idutilizador'];
+
+            // Buscar informações do grupo e membros
+            $groupInfo = buscarGrupo($userId);
+
+            // Verifique se as informações do grupo foram retornadas com sucesso
+            if ($groupInfo) {
+                // Atribua o groupId fora da função buscarGrupoEMembros
+                $groupId = $groupInfo['groupId'];
+            } else {
+                // Lidar com o caso em que as informações do grupo não foram encontradas
+                echo "Não foi possível encontrar informações do grupo.";
+                // Defina o groupId como vazio ou algum valor padrão, dependendo do caso
+                $groupId = '';
+            }
+
+            // Calcular a data de início e fim da semana atual
+            $startOfWeek = date('Y-m-d 00:00:00', strtotime('monday this week'));
+            $endOfWeek = date('Y-m-d 23:59:59', strtotime('sunday this week'));
+
+            // Preparar consulta SQL para buscar as tarefas do grupo do utilizador da semana atual
+            $sqlTarefas = "SELECT idtarefa, titulo, descricao, datahora, estado FROM tarefasg WHERE codgrupo = ? AND datahora BETWEEN ? AND ?";
+            $stmtTarefas = $mysqli->prepare($sqlTarefas);
+            $stmtTarefas->bind_param("sss", $groupId, $startOfWeek, $endOfWeek);
+            $stmtTarefas->execute();
+            $resultadoTarefas = $stmtTarefas->get_result();
+
+            // Preparar consulta SQL para buscar os eventos do grupo do utilizador da semana atual
+            $sqlEventos = "SELECT idevento, titulo, cor, inicio, fim FROM eventos WHERE codgrupo = ? AND inicio BETWEEN ? AND ?";
+            $stmtEventos = $mysqli->prepare($sqlEventos);
+            $stmtEventos->bind_param("sss", $groupId, $startOfWeek, $endOfWeek);
+            $stmtEventos->execute();
+            $resultadoEventos = $stmtEventos->get_result();
+
+            // Fechar statement
+            $stmtTarefas->close();
+            $stmtEventos->close();
+            ?>
+
             <div id="home" class="content active">
                 <main>
                     <header>
@@ -417,66 +500,44 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                         </button>
                         <h5>Olá <b><?php echo htmlspecialchars($user['primeironome']); ?></b>, bem vindo/a de volta!</h5>
                     </header>
-
-                    <div class="separator">
-                        <div class="info">
-                            <h3>Atividades</h3>
-                            <a href="#" onclick="changeContentA('activities', 'activities-nav')">Ver Tudo</a>
+                    <br><br>
+                    <div id="tarefas-section" class="dashboard-section">
+                        <!-- Tarefas do Grupo -->
+                        <div class="section-header">
+                            <h2>Tarefas da Semana</h2>
                         </div>
+                        <ul class="dashboard-list">
+                            <?php if ($resultadoTarefas->num_rows > 0) : ?>
+                                <?php while ($row = $resultadoTarefas->fetch_assoc()) : ?>
+                                    <li class="list-item">
+                                        <span class="item-title"><?php echo htmlspecialchars($row['titulo']); ?></span>
+                                        <span class="item-status"><?php echo htmlspecialchars($row['estado']); ?></span>
+                                    </li>
+                                <?php endwhile; ?>
+                            <?php else : ?>
+                                <li class="list-item empty">Nenhuma tarefa encontrada para esta semana.</li>
+                            <?php endif; ?>
+                        </ul>
                     </div>
 
-                    <?php
-                    // Consulta SQL para contar o número de tarefas e eventos do grupo
-                    $sqlAtividades = "SELECT tipo, COUNT(*) AS total FROM (SELECT 'Tarefa' AS tipo FROM tarefasg WHERE codgrupo = ? UNION ALL SELECT 'Evento' AS tipo FROM eventos WHERE codgrupo = ?) AS atividades GROUP BY tipo";
-                    $stmtAtividades = $mysqli->prepare($sqlAtividades);
-                    $stmtAtividades->bind_param('ss', $groupId, $groupId);
-                    $stmtAtividades->execute();
-                    $resultAtividades = $stmtAtividades->get_result();
-                    ?>
-
-                    <div class="chart-container">
-                        <canvas id="produtividade-chart"></canvas>
+                    <div id="eventos-section" class="dashboard-section">
+                        <!-- Eventos do Grupo -->
+                        <div class="section-header">
+                            <h2>Eventos da Semana</h2>
+                        </div>
+                        <ul class="dashboard-list">
+                            <?php if ($resultadoEventos->num_rows > 0) : ?>
+                                <?php while ($row = $resultadoEventos->fetch_assoc()) : ?>
+                                    <li class="list-item">
+                                        <span class="item-title"><?php echo htmlspecialchars($row['titulo']); ?></span>
+                                        <span class="item-status" style="background-color: <?php echo htmlspecialchars($row['cor']); ?>;"><?php echo htmlspecialchars($row['cor']); ?></span>
+                                    </li>
+                                <?php endwhile; ?>
+                            <?php else : ?>
+                                <li class="list-item empty">Nenhum evento encontrado para esta semana.</li>
+                            <?php endif; ?>
+                        </ul>
                     </div>
-
-                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                    <script>
-                        var ctx = document.getElementById('produtividade-chart').getContext('2d');
-                        var myChart = new Chart(ctx, {
-                            type: 'bar',
-                            data: {
-                                labels: ['Tarefas', 'Eventos'],
-                                datasets: [{
-                                    label: 'Total',
-                                    data: [
-                                        <?php
-                                        $rowTarefas = mysqli_fetch_assoc($resultAtividades);
-                                        echo $rowTarefas['total'] ?? '0'; ?>,
-                                        <?php
-                                        $rowEventos = mysqli_fetch_assoc($resultAtividades);
-                                        echo $rowEventos['total'] ?? '0'; ?>
-                                    ],
-                                    backgroundColor: [
-                                        'rgba(54, 162, 235, 0.2)',
-                                        'rgba(255, 99, 132, 0.2)'
-                                    ],
-                                    borderColor: [
-                                        'rgba(54, 162, 235, 1)',
-                                        'rgba(255, 99, 132, 1)'
-                                    ],
-                                    borderWidth: 1
-                                }]
-                            },
-                            options: {
-                                scales: {
-                                    yAxes: [{
-                                        ticks: {
-                                            beginAtZero: true
-                                        }
-                                    }]
-                                }
-                            }
-                        });
-                    </script>
                 </main>
             </div>
 
@@ -1373,8 +1434,8 @@ $estaEmGrupo = $resultGrupo->num_rows > 0;
                         }
                     },
                     eventConstraint: {
-                        start: '00:00', // Use this to define your business hours
-                        end: '24:00' // Use this to define your business hours
+                        start: '00:00', 
+                        end: '24:00' 
                     },
                     eventAllow: function(dropInfo, draggedEvent) {
                         var today = new Date().setHours(0, 0, 0, 0);
